@@ -1,2 +1,2 @@
-# emodpy-hbhi
-HBHI Workflow for EMODPy
+# emodpy-snt
+Subnational(SNT) Workflow for EMODPy

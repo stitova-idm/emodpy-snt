@@ -1,0 +1,15 @@
+admin_name,coverage,deploy_type,RTSS_day,vaccine,rtss_touchpoints,distribution_name,distribution_std,initial_effect,decay_time_constant,decay_class
+AA,0.725751849,EPI,883,primary,213,CONSTANT_DISTRIBUTION,1,0.8,592.4066512,WaningEffectExponential
+AA,0.8,EPI,883,booster,608,CONSTANT_DISTRIBUTION,1,0.4,592.4066512,WaningEffectExponential
+BB,0.91751634,EPI,883,primary,213,CONSTANT_DISTRIBUTION,1,0.8,592.4066512,WaningEffectExponential
+BB,0.8,EPI,883,booster,608,CONSTANT_DISTRIBUTION,1,0.4,592.4066512,WaningEffectExponential
+CC,0.368563457,EPI,883,primary,213,CONSTANT_DISTRIBUTION,1,0.8,592.4066512,WaningEffectExponential
+CC,0.8,EPI,883,booster,608,CONSTANT_DISTRIBUTION,1,0.4,592.4066512,WaningEffectExponential
+DD,0.719615782,EPI,883,primary,213,CONSTANT_DISTRIBUTION,1,0.8,592.4066512,WaningEffectExponential
+DD,0.8,EPI,883,booster,608,CONSTANT_DISTRIBUTION,1,0.4,592.4066512,WaningEffectExponential
+EE,0.579784638,EPI,883,primary,213,CONSTANT_DISTRIBUTION,1,0.8,592.4066512,WaningEffectExponential
+EE,0.8,EPI,883,booster,608,CONSTANT_DISTRIBUTION,1,0.4,592.4066512,WaningEffectExponential
+FF,0.676545733,EPI,883,primary,213,CONSTANT_DISTRIBUTION,1,0.8,592.4066512,WaningEffectExponential
+EE,0.8,EPI,883,booster,608,CONSTANT_DISTRIBUTION,1,0.4,592.4066512,WaningEffectExponential
+GG,0.444051305,EPI,883,primary,213,CONSTANT_DISTRIBUTION,1,0.8,592.4066512,WaningEffectExponential
+GG,0.8,EPI,883,booster,608,CONSTANT_DISTRIBUTION,1,0.4,592.4066512,WaningEffectExponential

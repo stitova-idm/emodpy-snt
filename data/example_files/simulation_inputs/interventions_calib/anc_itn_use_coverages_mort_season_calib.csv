@@ -1,0 +1,2 @@
+year,admin_name,coverage,duration,simday,net_life_lognormal_mu,net_life_lognormal_sigma,bio_mortality,block_initial,kill_initial,indoor_net_protection
+2018,AA,0.088143079,-1,0,6.420126265,0.8,0.7272811,0.864984254,0.528437592,0.75

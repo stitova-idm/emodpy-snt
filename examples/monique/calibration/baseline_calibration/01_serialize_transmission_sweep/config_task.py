@@ -49,22 +49,6 @@ def _config_campaign(campaign):
     pass
 
 
-def _config_demographics():
-    """
-    Config demographics
-
-    Args:
-
-    Returns:
-        demog
-
-    """
-    import emodpy_malaria.demographics.MalariaDemographics as Demographics  # OK to call into emod-api
-
-    demographics = Demographics.from_template_node(lat=0, lon=0, pop=10000, name=1, forced_id=1)
-    return demographics
-
-
 #####################################
 # Create EMODTask
 #####################################

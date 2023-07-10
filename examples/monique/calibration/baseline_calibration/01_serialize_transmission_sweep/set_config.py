@@ -20,6 +20,6 @@ def set_config(config):
 
     # move to here from set_input_files
     config.parameters.Demographics_Filenames = [os.path.join('demographics_and_climate', '_entire_country',
-                                                             f'demographics_each_admin_{params.population_size}i.json')]
+                                                             f'demographics_each_admin_{params.population_size}.json')]
 
     return config

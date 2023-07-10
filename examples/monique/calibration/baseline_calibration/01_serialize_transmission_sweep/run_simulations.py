@@ -1,5 +1,5 @@
-import params
 import manifest
+import params
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.templated_simulation import TemplatedSimulations

@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from emodpy import emod_task
 from emodpy_malaria.interventions.outbreak import add_outbreak_individual
 
@@ -108,8 +109,8 @@ def get_task(**kwargs):
     )
 
     # Config demographics
-    demog_path = os.path.join(manifest.input_dir, manifest.relative_path, manifest.demog_file)
-    task.common_assets.add_asset(demog_path, relative_path=manifest.relative_path)
+    demog_path = os.path.join(manifest.input_dir, params.demographics_file)
+    task.common_assets.add_asset(demog_path, relative_path=str(Path(params.demographics_file).parent))
 
     # More stuff to add to task, like reports...
     _config_reports(task)

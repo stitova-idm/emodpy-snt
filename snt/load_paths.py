@@ -6,7 +6,7 @@ def load_box_paths(user_path=None, country_name='Example'):
         user_path = os.path.expanduser('~')
 
     if country_name == 'Example':
-        home_path = os.path.join(user_path, 'Documents', 'malaria-snt-core/example_for_migration')
+        home_path = user_path
         data_path = home_path
         project_path = os.path.join(home_path, 'example_files')
     elif country_name == 'SierraLeone':

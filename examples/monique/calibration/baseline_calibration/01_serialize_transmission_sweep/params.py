@@ -3,7 +3,7 @@ import pandas as pd
 import manifest
 
 # run test
-test_run = True
+test_run = False
 
 # parameters
 expname = 'PfPR_calibration_burnin_sweep_example'

@@ -1,5 +1,5 @@
-import params
 import manifest
+import params
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.templated_simulation import TemplatedSimulations
@@ -12,6 +12,12 @@ def _print_params():
     Just a useful convenient function for the user.
     """
     print("test_run: ", params.test_run)
+    print("expname: ", params.expname)
+    print("population_size: ", params.population_size)
+    print("serialize: ", params.serialize)
+    print("num_seeds: ", params.num_seeds)
+    print("years: ", params.years)
+    print("pull_from_serialization: ", params.pull_from_serialization)
 
 
 def _pre_run(experiment: Experiment, **kwargs):

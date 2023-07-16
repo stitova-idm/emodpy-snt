@@ -1,3 +1,5 @@
+import os
+from pathlib import Path
 from emodpy import emod_task
 from emodpy_malaria.interventions.outbreak import add_outbreak_individual
 
@@ -21,18 +23,7 @@ def _config_reports(task):
     Returns: None
 
     """
-    from emodpy_malaria.reporters.builtin import add_report_malaria_filtered
-    from emodpy_malaria.reporters.builtin import add_malaria_summary_report
-    add_report_malaria_filtered(task, manifest,
-                                start_day=(params.years - 3) * 365,
-                                end_day=params.years * 365
-                                )
-    add_malaria_summary_report(task, manifest,
-                               start_day=(params.years - 1) * 365,
-                               reporting_interval=30,
-                               age_bins=[0.25, 5, 15, 125],
-                               parasitemia_bins=[10, 50, 1e9]
-                               )
+    pass
 
 
 def _config_campaign(campaign):
@@ -45,8 +36,8 @@ def _config_campaign(campaign):
     Returns: None
 
     """
-    add_outbreak_individual(campaign, start_day=35, demographic_coverage=0.002, timesteps_between_repetitions=73)
-    pass
+    add_outbreak_individual(campaign, demographic_coverage=0.002, start_day=35, repetitions=-1,
+                            timesteps_between_repetitions=73)
 
 
 #####################################
@@ -116,6 +107,10 @@ def get_task(**kwargs):
         param_custom_cb=set_config_parameters,
         ep4_custom_cb=None,
     )
+
+    # Config demographics
+    demog_path = os.path.join(manifest.input_dir, params.demographics_file)
+    task.common_assets.add_asset(demog_path, relative_path=str(Path(params.demographics_file).parent))
 
     # More stuff to add to task, like reports...
     _config_reports(task)

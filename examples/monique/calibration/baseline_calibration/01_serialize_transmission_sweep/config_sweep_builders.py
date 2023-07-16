@@ -57,34 +57,32 @@ def get_sweep_builders(**kwargs):
     scen_df = params.scen_df
     scen_index = params.scen_index
 
-    # health-seeking
+    # CM
     if (not pd.isna(scen_df.at[scen_index, 'CM_filename'])) and (not (scen_df.at[scen_index, 'CM_filename'] == '')):
         hs_df = pd.read_csv(
             os.path.join(project_path, 'simulation_inputs', '%s.csv' % scen_df.at[scen_index, 'CM_filename']))
     else:
         hs_df = pd.DataFrame()
-
     # NMFs
     if (not pd.isna(scen_df.at[scen_index, 'NMF_filename'])) and (not (scen_df.at[scen_index, 'NMF_filename'] == '')):
         nmf_df = pd.read_csv(
             os.path.join(project_path, 'simulation_inputs', '%s.csv' % scen_df.at[scen_index, 'NMF_filename']))
     else:
         nmf_df = pd.DataFrame()
-
     # ITNs
     if (not pd.isna(scen_df.at[scen_index, 'ITN_filename'])) and (not (scen_df.at[scen_index, 'ITN_filename'] == '')):
         itn_df = pd.read_csv(
             os.path.join(project_path, 'simulation_inputs', '%s.csv' % scen_df.at[scen_index, 'ITN_filename']))
     else:
         itn_df = pd.DataFrame()
-
+    # ANC_ITN_
     if (not pd.isna(scen_df.at[scen_index, 'ANC_ITN_filename'])) and (
             not (scen_df.at[scen_index, 'ANC_ITN_filename'] == '')):
         itn_anc_df = pd.read_csv(
             os.path.join(project_path, 'simulation_inputs', '%s.csv' % scen_df.at[scen_index, 'ANC_ITN_filename']))
     else:
         itn_anc_df = pd.DataFrame()
-
+    # EPI_ITN
     if (not pd.isna(scen_df.at[scen_index, 'EPI_ITN_filename'])) and (
             not (scen_df.at[scen_index, 'EPI_ITN_filename'] == '')):
         itn_epi_df = pd.read_csv(
@@ -100,7 +98,6 @@ def get_sweep_builders(**kwargs):
             os.path.join(project_path, 'simulation_inputs', '%s.csv' % scen_df.at[scen_index, 'IRS_filename']))
     else:
         irs_df = pd.DataFrame()
-
     # SMC
     if (not pd.isna(scen_df.at[scen_index, 'SMC_filename'])) and (not (scen_df.at[scen_index, 'SMC_filename'] == '')):
         smc_df = pd.read_csv(

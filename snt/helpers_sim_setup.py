@@ -1,28 +1,9 @@
 import os
 import pandas as pd
 import numpy as np
-from emodpy_malaria.interventions.outbreak import add_outbreak_individual
 from emodpy_malaria.malaria_config import configure_linear_spline, set_species_param, add_species
-from simtools.Utilities.Experiments import retrieve_experiment, retrieve_simulation
 from emod_api.interventions.common import change_individual_property_scheduled
-from dtk.utils.reports.CustomReport import BaseReport
-from COMPS.Data import Simulation, QueryCriteria
-
-
-
-# SVET - this is not needed
-# we have add_report_simulation_stats in builtin reporters, but it needs a task and manifest
-# I'm guessing wherever it is used, it'll have to be moved
-class ReportSimulationStats(BaseReport):
-    def __init__(self,
-                 type="ReportSimulationStats"):
-        BaseReport.__init__(self, type=type)
-
-    def to_dict(self):
-        d = super(ReportSimulationStats, self).to_dict()
-        # d.update({"Report_File_Name": 'ReportSimulationStats' + '.json'})
-        return d
-
+import emod_api.config.default_from_schema_no_validation as dfs
 
 def update_basic_params(config, manifest, project_path):
     # SVET - logLevel params might have issues
@@ -30,25 +11,20 @@ def update_basic_params(config, manifest, project_path):
     add_species(config, manifest, vector_species)
     config.parameters.Birth_Rate_Dependence = "FIXED_BIRTH_RATE"
     config.parameters.Age_Initialization_Distribution_Type = 'DISTRIBUTION_COMPLEX'
-    # SVET - this is how we add parameters that aren't in the schema for sft tests, hope this works
     config.parameters['logLevel_JsonConfigurable'] = 'ERROR'
     config.parameters['logLevel_VectorHabitat'] = 'ERROR'
     config.parameters['logLevel_StandardEventCoordinator'] = 'ERROR'
+    config.parameters['Habitat_Multiplier'] = 1
     config.parameters.Enable_Default_Reporting = 0
     config.parameters.Enable_Vector_Species_Report = 0
     config.parameters.Enable_Property_Output = 0
 
     config.parameters.Enable_Demographics_Risk = 1
-    config.parameters.Report_Detection_Threshold_Blood_Smear_Parasites = 0,
-    config.parameters.Parasite_Smear_Sensitivity = 0.01  # number of microliters of blood examined
-    config.parameters.RDT_Sensitivity = 0.1
+    config.parameters.Report_Detection_Threshold_Blood_Smear_Parasites = 0
+    config.parameters.Report_Parasite_Smear_Sensitivity = 0.01  # number of microliters of blood examined
 
-    config.parameters.Incubation_Period_Distribution = 'CONSTANT_DISTRIBUTION',
+    config.parameters.Incubation_Period_Distribution = 'CONSTANT_DISTRIBUTION'
     config.parameters.Incubation_Period_Constant = 3  # parameter shortened from 7 to yield a 12-13 day incubation period
-    config.parameters.Immunity_Acquisition_Factor = 1
-    config.parameters.Immunity_Initialization_Distribution_Type = "DISTRIBUTION_OFF"
-    config.parameters.Immunity_Mortality_Factor = 1
-    config.parameters.Immunity_Transmission_Factor = 1
 
     # read in and set vector bionomics
     vector_bionomics = pd.read_csv(os.path.join(project_path, 'simulation_inputs', 'vector_bionomics.csv'))
@@ -72,51 +48,23 @@ def habitat_scales(project_path):
 
 
 def set_input_files(config, hfca, archetype_hfca, population_size=1000):
-    # SVET - might not be able to add these to config
-    # i think this is how to add to not purge : config.parameters['Python_Script_Path'] = 'LOCAL'
     config.parameters.Climate_Model = "CLIMATE_CONSTANT"
     config.parameters["DS"] = hfca
     config.parameters["Archetype"] = archetype_hfca
-    # SVET - demographics filenames will be loaded elsewhere. in the demographics section?
-
-    # SVET - keeping for reference
-    # cb.update_params( {
-    #     'DS': hfca,
-    #     'Archeype': archetype_hfca,
-    #     # 'Demographics_Filenames': [os.path.join('demographics_and_climate', hfca, '%s_demographics_wVaxSMC_IPTi.json' % hfca)],
-    #     # 'Demographics_Filenames': [os.path.join('demographics_and_climate', hfca, '%s_demographics.json' % hfca)],
-    #     'Demographics_Filenames': [os.path.join('demographics_and_climate', '_entire_country', 'demographics_each_admin_%i.json' % population_size)],  # 'season_calib_deomgraphics.json')],
-    #     "Climate_Model": "CLIMATE_CONSTANT",
-    #     # "Air_Temperature_Filename": os.path.join('demographics_and_climate',archetype_hfca, '%s_air_temperature_daily_2016.bin' % archetype_hfca),
-    #     # "Land_Temperature_Filename": os.path.join('demographics_and_climate',archetype_hfca, '%s_air_temperature_daily_2016.bin' % archetype_hfca),
-    #     # "Rainfall_Filename": os.path.join('demographics_and_climate',archetype_hfca, '%s_rainfall_daily_2016.bin' % archetype_hfca),
-    #     # "Relative_Humidity_Filename": os.path.join('demographics_and_climate',archetype_hfca, '%s_relative_humidity_daily_2016.bin' % archetype_hfca)
-    # })
-
     return {'DS': hfca}
 
 
-def get_burnin_exp(burnin_id='', burnin_fname=''):
-    # SVET - Zhaowei help!
-    COMPS_login('https://comps.idmod.org')
+def get_burnin_exp(platform, burnin_id='', burnin_fname=''):
     if burnin_id:
         print("building from pickup: identifying burnin addresses from %s" % burnin_id)
-        # expt = retrieve_experiment(burnin_id, force_update=True)  # use this if the experiment address is not found even though the experiment succeeded on COMPS
-        expt = retrieve_experiment(burnin_id)
-        # creating data with all the simulation tags
-        ser_df = pd.DataFrame([x.tags for x in expt.simulations])
-        # getting paths for all the sims
-        # ser_df["outpath"] = pd.Series([sim.get_path() for sim in expt.simulations])  # old version that no longer works when initial simulation attempts fail
-        ser_df["outpath"] = pd.Series(
-            [Simulation.get(sim.id, QueryCriteria().select_children('hpc_jobs')).hpc_jobs[-1].working_directory for
-             sim in expt.simulations])
+        ser_df = platform.create_sim_directory_df(burnin_id)
     else:
         print("building from pickup: identifying burnin addresses from %s" % burnin_fname)
         ser_df = pd.read_csv(burnin_fname)
     return ser_df
 
 
-def set_up_hfca(config, manifest, campaign, hfca, archetype_hfca=None,
+def set_up_hfca(config, manifest, hfca, archetype_hfca=None,
                 pull_from_serialization=False, ser_date=50 * 365,
                 hdf=None, lhdf=None, population_size=1000,
                 hab_multiplier=-1, run_number=-1, use_arch_burnin=False, ser_df=pd.DataFrame()):
@@ -131,18 +79,6 @@ def set_up_hfca(config, manifest, campaign, hfca, archetype_hfca=None,
 
     set_habitats(config, manifest, hfca, hdf, lhdf, archetype_hfca, abs(hab_multiplier))
 
-    # SVET - ask Monique
-    # I'm not sure what this is trying to do?? There's a "Larval_Habitat_Multiplier" in a
-    # "ScaleLarvalHabitat" intervention. I'm not sure what this is doing in config?
-    # is this x_Temporary_Larval_Habitat???
-    # From docs: LarvalHabitatMultiplier This is read but not used. Both the LarvalHabitatMultiplier and the
-    # x_Temporary_Larval_Habitat are applied when a habitat is created at the beginning of a simulation. When the
-    # habitat is serialized, it is stored with the results of these multipliers. If you are reading from a serialized
-    # file and Serialization_Mask_Node_Read = 0, then you ignore both LarvalHabitatMultiplier and
-    # x_Temporary_Larval_Habitat settings and just use what was stored in the serialized file.
-    # If Serialization_Mask_Node_Read = 16, then we create new habitats and ignore what is in the serialized file.
-    # We do use the x_Temporary_Larval_Habitat setting to adjust the habitat, but it is a known issue that we don’t
-    # also use LarvalHabitatMultiplier.
     if pull_from_serialization:
         hab_scale_factor_param_name = 'Habitat_Multiplier'
         if use_arch_burnin:
@@ -153,9 +89,7 @@ def set_up_hfca(config, manifest, campaign, hfca, archetype_hfca=None,
                              (ser_df[hab_scale_factor_param_name] <= (np.round(hab_multiplier, 5) + 0.00001)) &
                              (ser_df['Run_Number'] == run_number) &
                              (ser_df['admin_name'] == archetype_hfca)]
-                cb.update_params({
-                    hab_scale_factor_param_name: hab_multiplier
-                })
+                config.parameters[hab_scale_factor_param_name] = hab_multiplier
                 ser_path = sdf['outpath'].values[0]
             else:
                 ser_path = ser_df['outpath'].values[0]
@@ -176,10 +110,6 @@ def set_up_hfca(config, manifest, campaign, hfca, archetype_hfca=None,
 
     else:
         config.parameters.Serialized_Population_Reading_Type = 'NONE'
-
-    # SVET - this will probably need to be pulled out
-    add_outbreak_individual(campaign, demographic_coverage=0.002, start_day=35, repetitions=-1,
-                            timesteps_between_repetitions=73)
 
     return {'admin_name': hfca}
 
@@ -209,13 +139,14 @@ def set_habitats(config, manifest, hfca, hdf, lhdf, archetype_hfca, hab_multipli
                                                         }
                                                         )
         set_species_param(config, sp, "Habitats", linear_spline_habitat)
-        # this function updates EMOD parameters to what is requested based on the calibration parameter sampling
-        set_species_param(config, sp, "Habitats", {"Habitat_Type": "CONSTANT",
-                                                   "Max_Larval_Capacity": pow(10, const) * s * const_mult})
+        new_habitat = dfs.schema_to_config_subnode(manifest.schema_file, ["idmTypes", "idmType:VectorHabitat"])
+        new_habitat.parameters.Habitat_Type = "CONSTANT"
+        new_habitat.parameters.Max_Larval_Capacity = pow(10, const) * s * const_mult
+        set_species_param(config, sp, "Habitats", new_habitat.parameters)
 
 
 def load_spline_and_scale_factors(lhdf, archetype_hfca):
-    # done
+
     lhdf = lhdf.set_index('archetype')
     my_spline = [lhdf.at[archetype_hfca, 'MonthVal%d' % x] for x in range(1, 13)]
     maxvalue = lhdf.at[archetype_hfca, 'MaxHab']
@@ -226,22 +157,11 @@ def load_spline_and_scale_factors(lhdf, archetype_hfca):
 
 
 def load_master_csv(project_path):
-    # done
     master_csv = os.path.join(project_path, 'admin_pop_archetype.csv')
     df = pd.read_csv(master_csv, encoding='latin')
     df['admin_name'] = df['admin_name'].str.normalize('NFKD').str.encode('ascii', errors='ignore').str.decode('utf-8')
     df = df.set_index('admin_name')
     return df
-
-
-# def load_pop_scale_factor(lhdf, archetype_hfca) :
-#
-#     df = load_master_csv()
-#     my_spline, maxvalue, const, pop_scale = load_spline_and_scale_factors(lhdf, archetype_hfca)
-#     scale_factor = 1 / 10000. * (1 / pop_scale)
-#     pop = df.at[archetype_hfca, 'population']
-#
-#     return pop, scale_factor
 
 
 def update_smc_access_ips(campaign, hfca, smc_df):

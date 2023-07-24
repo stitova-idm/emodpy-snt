@@ -1,8 +1,10 @@
-from simtools.Analysis.SSMTAnalysis import SSMTAnalysis
-from simtools.SetupParser import SetupParser
-from simulation.analyzers.analyze_helpers import monthlyU1PfPRAnalyzer, monthlyU5PfPRAnalyzer, monthlyTreatedCasesAnalyzer, monthlySevereTreatedByAgeAnalyzer, MonthlyNewInfectionsAnalyzer, monthlyEventAnalyzer, MonthlyNewInfectionsAnalyzer_withU5, monthlyUsageLLIN
-from simulation.analyzers.analyze_vector_numbers import VectorNumbersAnalyzer
-from simtools.Utilities.COMPSUtilities import get_most_recent_experiment_id_by_name
+from idmtools.core.platform_factory import Platform
+from idmtools.analysis.platform_anaylsis import PlatformAnalysis
+from snt.analyzers.analyze_helpers import monthlyU1PfPRAnalyzer, monthlyU5PfPRAnalyzer, monthlyTreatedCasesAnalyzer, \
+    monthlySevereTreatedByAgeAnalyzer, MonthlyNewInfectionsAnalyzer, monthlyEventAnalyzer, \
+    MonthlyNewInfectionsAnalyzer_withU5, monthlyUsageLLIN
+from snt.analyzers.analyze_vector_numbers import VectorNumbersAnalyzer
+from snt.utility.comps_functions import get_most_recent_experiment_id_by_name
 
 wi_name_base = "ssmt_analyzer_"
 working_dir = '.'
@@ -10,7 +12,6 @@ working_dir = '.'
 # end_year = 2021  # simulation ends in December of this year
 start_year = 2022  # simulation starts in January of this year
 end_year = 2029  # simulation ends in December of this year
-
 
 # can specify group of experiments by name...
 experiment_name_stem = ''
@@ -43,15 +44,12 @@ experiments = {
 
 }
 
-
-
 itn_comparison_flag = False
 climate_only_flag = False
 
 if __name__ == "__main__":
 
-    SetupParser.default_block = 'HPC'
-    SetupParser.init()
+    platform = Platform('Calculon')
 
     if not bool(experiments):
         for ee in range(len(experiment_numbers)):
@@ -61,15 +59,15 @@ if __name__ == "__main__":
 
     if end_year > 2022:
         analyzers = [
-                     monthlyU1PfPRAnalyzer,
-                     monthlyU5PfPRAnalyzer,
-                     monthlyTreatedCasesAnalyzer,
-                     monthlySevereTreatedByAgeAnalyzer,
-                     monthlyUsageLLIN,
-                     monthlyEventAnalyzer,
-                     MonthlyNewInfectionsAnalyzer,
-                     MonthlyNewInfectionsAnalyzer_withU5,
-                     VectorNumbersAnalyzer
+            monthlyU1PfPRAnalyzer,
+            monthlyU5PfPRAnalyzer,
+            monthlyTreatedCasesAnalyzer,
+            monthlySevereTreatedByAgeAnalyzer,
+            monthlyUsageLLIN,
+            monthlyEventAnalyzer,
+            MonthlyNewInfectionsAnalyzer,
+            MonthlyNewInfectionsAnalyzer_withU5,
+            VectorNumbersAnalyzer
         ]
     else:
         analyzers = [
@@ -110,11 +108,11 @@ if __name__ == "__main__":
                                   'input_filename_base': 'MalariaSummaryReport_Monthly',
                                   'output_filename': 'newInfections_PfPR_cases_monthly_byAgeGroup_withU5.csv'}
         args_no_u1 = {'expt_name': expt_name,
-                     'sweep_variables': sweep_variables,
-                     'working_dir': working_dir,
-                     'start_year': start_year,
-                     'end_year': end_year,
-                     'agebins': [5, 200]}
+                      'sweep_variables': sweep_variables,
+                      'working_dir': working_dir,
+                      'start_year': start_year,
+                      'end_year': end_year,
+                      'agebins': [5, 200]}
         if itn_comparison_flag:
             args_treat_case = {'expt_name': expt_name,
                                'channels': [],
@@ -132,31 +130,31 @@ if __name__ == "__main__":
         else:
             args_treat_case = args_each
         if end_year > 2022:
-            analysis = SSMTAnalysis(experiment_ids=[exp_id],
-                                    analyzers=analyzers,
-                                    analyzers_args=[
-                                                    args_each,
-                                                    args_each,
-                                                    args_treat_case,
-                                                    args_each,
-                                                    args_each,
-                                                    args_each,
-                                                    args_new_infect,
-                                                    args_new_infect_withU5,
-                                                    args_each
-                                                    ],
-                                    analysis_name=wi_name)
+            analysis = PlatformAnalysis(experiment_ids=[exp_id],
+                                        analyzers=analyzers,
+                                        analyzers_args=[
+                                            args_each,
+                                            args_each,
+                                            args_treat_case,
+                                            args_each,
+                                            args_each,
+                                            args_each,
+                                            args_new_infect,
+                                            args_new_infect_withU5,
+                                            args_each
+                                        ],
+                                        analysis_name=wi_name)
         else:
-            analysis = SSMTAnalysis(experiment_ids=[exp_id],
-                                    analyzers=analyzers,
-                                    analyzers_args=[
-                                        args_each,
-                                        args_treat_case,
-                                        args_no_u1,
-                                        args_each,
-                                        args_each,
-                                        args_new_infect,
-                                        args_new_infect_withU5,
-                                    ],
-                                    analysis_name=wi_name)
+            analysis = PlatformAnalysis(experiment_ids=[exp_id],
+                                        analyzers=analyzers,
+                                        analyzers_args=[
+                                            args_each,
+                                            args_treat_case,
+                                            args_no_u1,
+                                            args_each,
+                                            args_each,
+                                            args_new_infect,
+                                            args_new_infect_withU5,
+                                        ],
+                                        analysis_name=wi_name)
         analysis.analyze()

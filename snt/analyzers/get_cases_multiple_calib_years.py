@@ -1,14 +1,11 @@
+import os
+import datetime
 import pandas as pd
 import numpy as np
-from simtools.Analysis.BaseAnalyzers import BaseAnalyzer
-import datetime
-import os
-import sys
-sys.path.append('../')
+from idmtools.entities import IAnalyzer
 
 
-
-class monthlyTreatedCasesAnalyzer(BaseAnalyzer):
+class monthlyTreatedCasesAnalyzer(IAnalyzer):
 
     @classmethod
     def monthparser(self, x):
@@ -40,7 +37,7 @@ class monthlyTreatedCasesAnalyzer(BaseAnalyzer):
         # return simulation.tags['__sample_index__'] == 0  #!!!
         return simulation
 
-    def select_simulation_data(self, data, simulation):
+    def map(self, data, simulation):
 
         simdata = pd.DataFrame({x: data[self.filenames[0]]['Channels'][x]['Data'] for x in self.channels})
         simdata['Time'] = simdata.index
@@ -61,7 +58,7 @@ class monthlyTreatedCasesAnalyzer(BaseAnalyzer):
                 simdata[sweep_var] = simulation.tags[sweep_var]
         return simdata
 
-    def finalize(self, all_data):
+    def reduce(self, all_data):
 
         selected = [data for sim, data in all_data.items()]
         if len(selected) == 0:
@@ -84,37 +81,37 @@ class monthlyTreatedCasesAnalyzer(BaseAnalyzer):
         adf.to_csv(os.path.join(self.working_dir, self.expt_name, 'All_Age_monthly_Cases.csv'), index=False)
 
 
-
-
 if __name__ == "__main__":
+    from idmtools.analysis.analyze_manager import AnalyzeManager
+    from idmtools.core.platform_factory import Platform
+    from idmtools.core import ItemType
+    from snt.load_paths import load_box_paths
 
-    from simtools.Analysis.AnalyzeManager import AnalyzeManager
-    from simtools.SetupParser import SetupParser
+    platform = Platform('CALCULOUS')
 
-    from simulation.load_paths import load_box_paths
     data_path, project_path = load_box_paths(country_name='Burundi')
 
-    SetupParser.default_block = 'HPC'
-    SetupParser.init()
-
     working_dir = os.path.join(project_path, 'simulation_output', 'seasonality_calibration')
-    start_year = 2015#2011
-    end_year = 2018#2021
+    start_year = 2015  # 2011
+    end_year = 2018  # 2021
 
     expt_ids = {
         # 'TEST17blonger_2017_seasonality_calibration_1arch_Gitega_round2_iter0': '9aeeb00e-328d-eb11-a2ce-c4346bcb1550',
         'seasonality_calibration_1arch_Gitega_2017_round1_iter10': '979c5712-5b8d-eb11-a2ce-c4346bcb1550',
 
     }
-    for expname, expid in expt_ids.items() :
+    for expname, expid in expt_ids.items():
         print('running expt %s' % expname)
         cur_monthlyTreatedCasesAnalyzer = monthlyTreatedCasesAnalyzer(expt_name=expname,
-                                                                      channels=['Received_NMF_Treatment', 'Received_Treatment'],
-                                                                      sweep_variables=["Run_Number", "__sample_index__"],
+                                                                      channels=['Received_NMF_Treatment',
+                                                                                'Received_Treatment'],
+                                                                      sweep_variables=["Run_Number",
+                                                                                       "__sample_index__"],
                                                                       working_dir=working_dir,
                                                                       start_year=start_year,
                                                                       end_year=end_year)
 
         analyzers = [cur_monthlyTreatedCasesAnalyzer]
-        am = AnalyzeManager(expid, analyzers=analyzers, force_analyze=True)
+        am = AnalyzeManager(platform=platform, ids=[(expid, ItemType.EXPERIMENT)], analyzers=analyzers,
+                            force_analyze=True)
         am.analyze()

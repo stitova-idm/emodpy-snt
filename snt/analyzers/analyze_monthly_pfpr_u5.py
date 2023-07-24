@@ -1,16 +1,15 @@
 import os
-import numpy as np
 import pandas as pd
-from simtools.Analysis.BaseAnalyzers import BaseAnalyzer
+from idmtools.entities import IAnalyzer
 
 
-class MonthlyPfPRU5Analyzer(BaseAnalyzer):
+class MonthlyPfPRU5Analyzer(IAnalyzer):
 
     def __init__(self, expt_name, sweep_variables=None, working_dir=".", start_year=2010, end_year=2016,
                  input_filename_base='MalariaSummaryReport_Monthly'):
         super(MonthlyPfPRU5Analyzer, self).__init__(working_dir=working_dir,
                                                     filenames=["output/%s%d.json" % (input_filename_base, x)
-                                                               for x in range(start_year, (1+end_year))]
+                                                               for x in range(start_year, (1 + end_year))]
                                                     )
         self.sweep_variables = sweep_variables or ["Run_Number"]
         self.mult_param = 'Habitat_Multiplier'
@@ -18,17 +17,18 @@ class MonthlyPfPRU5Analyzer(BaseAnalyzer):
         self.start_year = start_year
         self.end_year = end_year
 
-
-    def select_simulation_data(self, data, simulation):
+    def map(self, data, simulation):
 
         adf = pd.DataFrame()
         aa = 1  # index for the 0.5-5 year age group
-        for year, fname in zip(range(self.start_year, (self.end_year+1)), self.filenames):
+        for year, fname in zip(range(self.start_year, (self.end_year + 1)), self.filenames):
             # population size
-            pop = data[fname]['DataByTimeAndAgeBins']['Average Population by Age Bin'][:12]  # remove final five days: assume final five days have same average as rest of month
+            pop = data[fname]['DataByTimeAndAgeBins']['Average Population by Age Bin'][
+                  :12]  # remove final five days: assume final five days have same average as rest of month
             pop_monthly = [x[aa] for x in pop]
             # PfPR
-            d = data[fname]['DataByTimeAndAgeBins']['PfPR by Age Bin'][:12]  # remove final five days: assume final five days have same average as rest of month
+            d = data[fname]['DataByTimeAndAgeBins']['PfPR by Age Bin'][
+                :12]  # remove final five days: assume final five days have same average as rest of month
             pfpr_monthly = [x[aa] for x in d]
             # combine in data frame
             simdata = pd.DataFrame({'month': list(range(1, 13)),
@@ -43,7 +43,7 @@ class MonthlyPfPRU5Analyzer(BaseAnalyzer):
                 adf[sweep_var] = simulation.tags[sweep_var]
         return adf
 
-    def finalize(self, all_data):
+    def reduce(self, all_data):
 
         selected = [data for sim, data in all_data.items()]
         if len(selected) == 0:

@@ -12,7 +12,7 @@ from emodpy_malaria.interventions.diag_survey import add_diagnostic_survey
 from snt.support_files.malaria_vaccdrug_campaigns import add_vaccdrug_campaign
 from emodpy_malaria.interventions.adherentdrug import adherent_drug
 from snt.helpers_sim_setup import update_smc_access_ips
-from emodpy_malaria.interventions.vaccine import add_scheduled_vaccine, add_triggered_vaccine
+from emodpy_malaria.interventions.vaccine import add_scheduled_vaccine, add_triggered_vaccine, _simple_vaccine
 from emodpy_malaria.interventions.common import add_triggered_campaign_delay_event
 from emod_api.interventions.common import BroadcastEvent, DelayedIntervention
 
@@ -693,7 +693,7 @@ def change_rtss_ips(campaign):
                                          blackout=False)
 
 
-def add_epi_rtss(campaign, rtss_df):
+def add_EPI_rtss(campaign, rtss_df):
     start_days = list(rtss_df['RTSS_day'].unique())
     coverage_levels = list(rtss_df['coverage'].values)
     rtss_types = list(rtss_df['vaccine'].values)
@@ -719,59 +719,35 @@ def add_epi_rtss(campaign, rtss_df):
             delay_distribution = {"Delay_Period_Distribution": "GAUSSIAN_DISTRIBUTION",
                                   "Delay_Period_Gaussian_Mean": tp_time_trigger,
                                   "Delay_Period_Gaussian_Std_Dev": std}
-        else:  # no delay
-            delay_distribution = None
+        else:  # delay is constant (use tp_time_trigger directly)
+            delay_distribution = {"Delay_Period_Distribution": "CONSTANT_DISTRIBUTION",
+                                  "Delay_Period_Constant": tp_time_trigger}
+
+        # triggered_campaign_delay_event only has option for constant delay, but we need different
+        # distributions, so we're manually creating a delayed intervention that broadcasts an event
+        # and slipping it into the triggered intervention
+        broadcast_event = BroadcastEvent(campaign, event_name)
+        vaccine = _simple_vaccine(campaign, intervention_name="RTSS",
+                                  vaccine_type="AquisitionBlocking",
+                                  vaccine_initial_effect=init_eff,
+                                  vaccine_box_duration=0,
+                                  vaccine_decay_time_constant=decay_t,
+                                  efficacy_is_multiplicative=False)
+        delayed_event = DelayedIntervention(campaign, Configs=[broadcast_event, vaccine],
+                                            Delay_Dict=delay_distribution)
 
         # TODO: Make EPI support booster1 and booster2
         if not vtype == 'booster':
-            # triggered_campaign_delay_event only has option for constant delay, but we need different
-            # distributions, so we're manually creating a delayed intervention that broadcasts an event
-            # and slipping it into the triggered intervention
-            broadcast_event = BroadcastEvent(campaign, event_name)
-            if delay_distribution:
-                broadcast_event = DelayedIntervention(campaign, Configs=[broadcast_event],
-                                                      Delay_Dict=delay_distribution)
             add_triggered_campaign_delay_event(campaign, start_day=start_days[0],
                                                trigger_condition_list=['Births'],
                                                demographic_coverage=coverage,
-                                               individual_intervention=broadcast_event)
-            # SVET - verify this is what's wanted. Original code had multiple start days
-            add_triggered_vaccine(campaign,
-                                  start_day=start_days[0],
-                                  trigger_condition_list=[event_name],
-                                  intervention_name='RTSS',
-                                  broadcast_event='Received_Vaccine',
-                                  vaccine_type="AquisitionBlocking",
-                                  vaccine_initial_effect=init_eff,
-                                  vaccine_box_duration=0,
-                                  vaccine_decay_time_constant=decay_t,
-                                  efficacy_is_multiplicative=False
-                                  )
+                                               individual_intervention=delayed_event)
         else:
-            # triggered_campaign_delay_event only has option for constant delay, but we need different
-            # distributions, so we're manually creating a delayed intervention that broadcasts an event
-            # and slipping it into the triggered intervention
-            broadcast_event = BroadcastEvent(campaign, event_name)
-            if delay_distribution:
-                broadcast_event = DelayedIntervention(campaign, Configs=[broadcast_event],
-                                                      Delay_Dict=delay_distribution)
             add_triggered_campaign_delay_event(campaign, start_day=start_days[0],
                                                trigger_condition_list=['Births'],
                                                demographic_coverage=coverage,
-                                               individual_intervention=broadcast_event)
-
-            add_triggered_vaccine(campaign,
-                                  start_day=start_days[0],
-                                  trigger_condition_list=[event_name],
-                                  ind_property_restrictions=[{'VaccineStatus': 'GotVaccine'}],
-                                  intervention_name='RTSS',
-                                  broadcast_event='Received_Vaccine',
-                                  vaccine_type="AquisitionBlocking",
-                                  vaccine_initial_effect=init_eff,
-                                  vaccine_box_duration=0,
-                                  vaccine_decay_time_constant=decay_t,
-                                  efficacy_is_multiplicative=False
-                                  )
+                                               individual_intervention=delayed_event,
+                                               ind_property_restrictions=[{'VaccineStatus': 'GotVaccine'}])
 
 
 def add_campaign_rtss(campaign, rtss_df):

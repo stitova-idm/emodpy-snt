@@ -16,8 +16,6 @@ from emodpy_malaria.interventions.vaccine import add_scheduled_vaccine, add_trig
 from emodpy_malaria.interventions.common import add_triggered_campaign_delay_event
 from emod_api.interventions.common import BroadcastEvent, DelayedIntervention
 
-# SVET - several notes marked 'svet'
-
 
 def add_hfca_hs(campaign, hs_df, hfca, seed_index=0):
     # df = hs_df[hs_df['repDS'] == hfca]
@@ -229,8 +227,6 @@ def add_itn_from_file(campaign, row, itn_use_seasonality, itn_decay_params):
                                                          'Values': [x * indoor_net_protection for x in age_dep]},
                                          seasonal_dependence={"Times": seasonal_times,
                                                               "Values": seasonal_scales})
-    # it says simday == 895, but intervention definitely starts doing its thing on start_day 0, is it
-    # just that the data is in simday 895?
     if 'ITN coverage severe treatment' in row:
         if row['simday'] == 895:
             add_triggered_usage_dependent_bednet(campaign, start_day=0,
@@ -247,7 +243,6 @@ def add_itn_from_file(campaign, row, itn_use_seasonality, itn_decay_params):
                                                                             age_dep]},
                                                  seasonal_dependence={"Times": seasonal_times,
                                                                       "Values": seasonal_scales})
-    # st question as above
     if 'ITN coverage uncomplicated treatment' in row:
         if row['simday'] == 895:
             add_triggered_usage_dependent_bednet(campaign, start_day=0,
@@ -727,13 +722,15 @@ def add_EPI_rtss(campaign, rtss_df):
         # distributions, so we're manually creating a delayed intervention that broadcasts an event
         # and slipping it into the triggered intervention
         broadcast_event = BroadcastEvent(campaign, event_name)
+        broadcast_event_vaccine = BroadcastEvent(campaign, 'Received_Vaccine')
         vaccine = _simple_vaccine(campaign, intervention_name="RTSS",
                                   vaccine_type="AquisitionBlocking",
                                   vaccine_initial_effect=init_eff,
                                   vaccine_box_duration=0,
                                   vaccine_decay_time_constant=decay_t,
                                   efficacy_is_multiplicative=False)
-        delayed_event = DelayedIntervention(campaign, Configs=[broadcast_event, vaccine],
+        delayed_event = DelayedIntervention(campaign, Configs=[broadcast_event, broadcast_event_vaccine,
+                                                               vaccine],
                                             Delay_Dict=delay_distribution)
 
         # TODO: Make EPI support booster1 and booster2
@@ -826,7 +823,7 @@ def add_ds_rtss(campaign, rtss_df, hfca):
     # First, process EPI style distribution
     rtss_df1 = rtss_df[rtss_df['deploy_type'] == 'EPI']
     if len(rtss_df1) > 0:
-        add_epi_rtss(campaign, rtss_df1)
+        add_EPI_rtss(campaign, rtss_df1)
         change_ips = True
 
     # Second, process campaign style distribution

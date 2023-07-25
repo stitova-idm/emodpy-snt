@@ -68,11 +68,7 @@ def set_up_hfca(config, manifest, hfca, archetype_hfca=None,
                 pull_from_serialization=False, ser_date=50 * 365,
                 hdf=None, lhdf=None, population_size=1000,
                 hab_multiplier=-1, run_number=-1, use_arch_burnin=False, ser_df=pd.DataFrame()):
-    # SVET - function signature changed
-    # this function needs a campaign (for the intervention), config (to set parameters),
-    # and manifest(to configure the linear spline in set_habitats())
-    # to do all the things it's trying to do.
-    # It will probably have to be split up since we separate campaign and config stuff?
+
     set_input_files(config, hfca, archetype_hfca, population_size)
     if not archetype_hfca:
         archetype_hfca = hfca
@@ -138,7 +134,7 @@ def set_habitats(config, manifest, hfca, hdf, lhdf, archetype_hfca, hab_multipli
                                                             "Values": my_spline
                                                         }
                                                         )
-        set_species_param(config, sp, "Habitats", linear_spline_habitat)
+        set_species_param(config, sp, "Habitats", linear_spline_habitat, overwrite=True)
         new_habitat = dfs.schema_to_config_subnode(manifest.schema_file, ["idmTypes", "idmType:VectorHabitat"])
         new_habitat.parameters.Habitat_Type = "CONSTANT"
         new_habitat.parameters.Max_Larval_Capacity = pow(10, const) * s * const_mult

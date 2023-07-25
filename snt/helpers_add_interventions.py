@@ -12,9 +12,11 @@ from emodpy_malaria.interventions.diag_survey import add_diagnostic_survey
 from snt.support_files.malaria_vaccdrug_campaigns import add_vaccdrug_campaign
 from emodpy_malaria.interventions.adherentdrug import adherent_drug
 from snt.helpers_sim_setup import update_smc_access_ips
-from emodpy_malaria.interventions.vaccine import add_scheduled_vaccine, add_triggered_vaccine, _simple_vaccine
+from emodpy_malaria.interventions.vaccine import add_scheduled_vaccine, add_triggered_vaccine
 from emodpy_malaria.interventions.common import add_triggered_campaign_delay_event
 from emod_api.interventions.common import BroadcastEvent, DelayedIntervention
+
+# SVET - several notes marked 'svet'
 
 
 def add_hfca_hs(campaign, hs_df, hfca, seed_index=0):
@@ -181,7 +183,7 @@ def add_itn_from_file(campaign, row, itn_use_seasonality, itn_decay_params):
                           "Expiration_Period_Log_Normal_Mu": row['net_life_lognormal_mu'],
                           "Expiration_Period_Log_Normal_Sigma": row['net_life_lognormal_sigma']}
     itn_decay_kill = itn_decay_params['kill_decay_time'][0].item()
-    itn_decay_block = itn_decay_params['block_decay_time'][0]
+    itn_decay_block = itn_decay_params['block_decay_time'][0].item()
 
     # seasonality in ITN use
     seasonal_scales = itn_use_seasonality['itn_use_scalar']
@@ -217,16 +219,16 @@ def add_itn_from_file(campaign, row, itn_use_seasonality, itn_decay_params):
 
     add_scheduled_usage_dependent_bednet(campaign, start_day=row['simday'], demographic_coverage=coverage_all,
                                          killing_initial_effect=row['kill_initial'],
-                                         killing_box_duration=0,
                                          killing_decay_time_constant=itn_decay_kill,
                                          blocking_initial_effect=row['block_initial'],
-                                         blocking_box_duration=0,
                                          blocking_decay_time_constant=itn_decay_block,
                                          discard_config=itn_discard_config,
                                          age_dependence={'Times': [0, 5, 10, 15, 20],
                                                          'Values': [x * indoor_net_protection for x in age_dep]},
                                          seasonal_dependence={"Times": seasonal_times,
                                                               "Values": seasonal_scales})
+    # it says simday == 895, but intervention definitely starts doing its thing on start_day 0, is it
+    # just that the data is in simday 895?
     if 'ITN coverage severe treatment' in row:
         if row['simday'] == 895:
             add_triggered_usage_dependent_bednet(campaign, start_day=0,
@@ -243,6 +245,7 @@ def add_itn_from_file(campaign, row, itn_use_seasonality, itn_decay_params):
                                                                             age_dep]},
                                                  seasonal_dependence={"Times": seasonal_times,
                                                                       "Values": seasonal_scales})
+    # st question as above
     if 'ITN coverage uncomplicated treatment' in row:
         if row['simday'] == 895:
             add_triggered_usage_dependent_bednet(campaign, start_day=0,
@@ -263,8 +266,8 @@ def add_itn_from_file(campaign, row, itn_use_seasonality, itn_decay_params):
 
 def add_birthday_routine_itn_from_file(campaign, itn_epi_df, itn_use_seasonality, itn_decay_params):
     # decay rates of killing and blocking
-    itn_decay_kill = itn_decay_params['kill_decay_time'][0]
-    itn_decay_block = itn_decay_params['block_decay_time'][0]
+    itn_decay_kill = itn_decay_params['kill_decay_time'][0].item()
+    itn_decay_block = itn_decay_params['block_decay_time'][0].item()
 
     # seasonality in ITN use
     seasonal_scales = itn_use_seasonality['itn_use_scalar']
@@ -309,8 +312,8 @@ def add_birthday_routine_itn_from_file(campaign, itn_epi_df, itn_use_seasonality
 
 def add_itn_anc(campaign, itn_anc_df, itn_anc_adult_birthday_years, itn_use_seasonality, itn_decay_params):
     # decay rates of killing and blocking
-    itn_decay_kill = itn_decay_params['kill_decay_time'][0]
-    itn_decay_block = itn_decay_params['block_decay_time'][0]
+    itn_decay_kill = itn_decay_params['kill_decay_time'][0].item()
+    itn_decay_block = itn_decay_params['block_decay_time'][0].item()
 
     # seasonality in ITN use
     seasonal_scales = itn_use_seasonality['itn_use_scalar']
@@ -373,8 +376,8 @@ def add_monthly_chw_dist(campaign, row, itn_use_seasonality, itn_decay_params):
     itn_discard_config = {"Expiration_Period_Distribution": "LOG_NORMAL_DISTRIBUTION",
                           "Expiration_Period_Log_Normal_Mu": row['net_life_lognormal_mu'],
                           "Expiration_Period_Log_Normal_Sigma": row['net_life_lognormal_sigma']}
-    itn_decay_kill = itn_decay_params['kill_decay_time'][0]
-    itn_decay_block = itn_decay_params['block_decay_time'][0]
+    itn_decay_kill = itn_decay_params['kill_decay_time'][0].item()
+    itn_decay_block = itn_decay_params['block_decay_time'][0].item()
 
     # use-coverage by age
     itn_u5 = row['itn_u5']
@@ -425,8 +428,8 @@ def add_monthly_chw_dist(campaign, row, itn_use_seasonality, itn_decay_params):
 
 
 def add_annual_chw_dist(campaign, row, itn_use_seasonality, itn_decay_params):
-    itn_decay_kill = itn_decay_params['kill_decay_time'][0]
-    itn_decay_block = itn_decay_params['block_decay_time'][0]
+    itn_decay_kill = itn_decay_params['kill_decay_time'][0].item()
+    itn_decay_block = itn_decay_params['block_decay_time'][0].item()
 
     # use-coverage by age
     itn_u5 = row['itn_u5']
@@ -688,7 +691,7 @@ def change_rtss_ips(campaign):
                                          blackout=False)
 
 
-def add_EPI_rtss(campaign, rtss_df):
+def add_epi_rtss(campaign, rtss_df):
     start_days = list(rtss_df['RTSS_day'].unique())
     coverage_levels = list(rtss_df['coverage'].values)
     rtss_types = list(rtss_df['vaccine'].values)
@@ -714,37 +717,59 @@ def add_EPI_rtss(campaign, rtss_df):
             delay_distribution = {"Delay_Period_Distribution": "GAUSSIAN_DISTRIBUTION",
                                   "Delay_Period_Gaussian_Mean": tp_time_trigger,
                                   "Delay_Period_Gaussian_Std_Dev": std}
-        else:  # delay is constant (use tp_time_trigger directly)
-            delay_distribution = {"Delay_Period_Distribution": "CONSTANT_DISTRIBUTION",
-                                  "Delay_Period_Constant": tp_time_trigger}
+        else:  # no delay
+            delay_distribution = None
 
-        # triggered_campaign_delay_event only has option for constant delay, but we need different
-        # distributions, so we're manually creating a delayed intervention that broadcasts an event
-        # and slipping it into the triggered intervention
-        broadcast_event = BroadcastEvent(campaign, event_name)
-        broadcast_event_vaccine = BroadcastEvent(campaign, 'Received_Vaccine')
-        vaccine = _simple_vaccine(campaign, intervention_name="RTSS",
+        # TODO: Make EPI support booster1 and booster2
+        if not vtype == 'booster':
+            # triggered_campaign_delay_event only has option for constant delay, but we need different
+            # distributions, so we're manually creating a delayed intervention that broadcasts an event
+            # and slipping it into the triggered intervention
+            broadcast_event = BroadcastEvent(campaign, event_name)
+            if delay_distribution:
+                broadcast_event = DelayedIntervention(campaign, Configs=[broadcast_event],
+                                                      Delay_Dict=delay_distribution)
+            add_triggered_campaign_delay_event(campaign, start_day=start_days[0],
+                                               trigger_condition_list=['Births'],
+                                               demographic_coverage=coverage,
+                                               individual_intervention=broadcast_event)
+            # SVET - verify this is what's wanted. Original code had multiple start days
+            add_triggered_vaccine(campaign,
+                                  start_day=start_days[0],
+                                  trigger_condition_list=[event_name],
+                                  intervention_name='RTSS',
+                                  broadcast_event='Received_Vaccine',
                                   vaccine_type="AquisitionBlocking",
                                   vaccine_initial_effect=init_eff,
                                   vaccine_box_duration=0,
                                   vaccine_decay_time_constant=decay_t,
-                                  efficacy_is_multiplicative=False)
-        delayed_event = DelayedIntervention(campaign, Configs=[broadcast_event, broadcast_event_vaccine,
-                                                               vaccine],
-                                            Delay_Dict=delay_distribution)
-
-        # TODO: Make EPI support booster1 and booster2
-        if not vtype == 'booster':
-            add_triggered_campaign_delay_event(campaign, start_day=start_days[0],
-                                               trigger_condition_list=['Births'],
-                                               demographic_coverage=coverage,
-                                               individual_intervention=delayed_event)
+                                  efficacy_is_multiplicative=False
+                                  )
         else:
+            # triggered_campaign_delay_event only has option for constant delay, but we need different
+            # distributions, so we're manually creating a delayed intervention that broadcasts an event
+            # and slipping it into the triggered intervention
+            broadcast_event = BroadcastEvent(campaign, event_name)
+            if delay_distribution:
+                broadcast_event = DelayedIntervention(campaign, Configs=[broadcast_event],
+                                                      Delay_Dict=delay_distribution)
             add_triggered_campaign_delay_event(campaign, start_day=start_days[0],
                                                trigger_condition_list=['Births'],
                                                demographic_coverage=coverage,
-                                               individual_intervention=delayed_event,
-                                               ind_property_restrictions=[{'VaccineStatus': 'GotVaccine'}])
+                                               individual_intervention=broadcast_event)
+
+            add_triggered_vaccine(campaign,
+                                  start_day=start_days[0],
+                                  trigger_condition_list=[event_name],
+                                  ind_property_restrictions=[{'VaccineStatus': 'GotVaccine'}],
+                                  intervention_name='RTSS',
+                                  broadcast_event='Received_Vaccine',
+                                  vaccine_type="AquisitionBlocking",
+                                  vaccine_initial_effect=init_eff,
+                                  vaccine_box_duration=0,
+                                  vaccine_decay_time_constant=decay_t,
+                                  efficacy_is_multiplicative=False
+                                  )
 
 
 def add_campaign_rtss(campaign, rtss_df):
@@ -823,7 +848,7 @@ def add_ds_rtss(campaign, rtss_df, hfca):
     # First, process EPI style distribution
     rtss_df1 = rtss_df[rtss_df['deploy_type'] == 'EPI']
     if len(rtss_df1) > 0:
-        add_EPI_rtss(campaign, rtss_df1)
+        add_epi_rtss(campaign, rtss_df1)
         change_ips = True
 
     # Second, process campaign style distribution

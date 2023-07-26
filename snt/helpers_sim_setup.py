@@ -6,7 +6,6 @@ from emod_api.interventions.common import change_individual_property_scheduled
 import emod_api.config.default_from_schema_no_validation as dfs
 
 def update_basic_params(config, manifest, project_path):
-    # SVET - logLevel params might have issues
     vector_species = ['arabiensis', 'funestus', 'gambiae']
     add_species(config, manifest, vector_species)
     config.parameters.Birth_Rate_Dependence = "FIXED_BIRTH_RATE"
@@ -18,11 +17,9 @@ def update_basic_params(config, manifest, project_path):
     config.parameters.Enable_Default_Reporting = 0
     config.parameters.Enable_Vector_Species_Report = 0
     config.parameters.Enable_Property_Output = 0
-
     config.parameters.Enable_Demographics_Risk = 1
     config.parameters.Report_Detection_Threshold_Blood_Smear_Parasites = 0
     config.parameters.Report_Parasite_Smear_Sensitivity = 0.01  # number of microliters of blood examined
-
     config.parameters.Incubation_Period_Distribution = 'CONSTANT_DISTRIBUTION'
     config.parameters.Incubation_Period_Constant = 3  # parameter shortened from 7 to yield a 12-13 day incubation period
 
@@ -34,6 +31,15 @@ def update_basic_params(config, manifest, project_path):
         set_species_param(config, vector, 'Anthropophily', bionomics_row['Anthropophily'][0])
         set_species_param(config, vector, 'Indoor_Feeding_Fraction', bionomics_row['Indoor_Feeding_Fraction'][0])
         set_species_param(config, vector, 'Days_Between_Feeds', bionomics_row['Days_Between_Feeds'][0])
+
+    # added to match the old config to the new config
+    config.parameters.Enable_Natural_Mortality = 1
+    config.parameters.Enable_Initial_Prevalence = 1
+    config.parameters.Base_Air_Temperature = 22
+    config.parameters.Enable_Demographics_Births = 1
+    config.parameters.Enable_Vector_Migration = 0
+
+
 
 
 def habitat_scales(project_path):

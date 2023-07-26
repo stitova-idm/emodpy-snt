@@ -35,8 +35,8 @@ def _config_reports(task):
                                start_day=(params.years - 1) * 365,
                                age_bins=[0.25, 5, 15, 125],
                                reporting_interval=30,
-                               parasitemia_bins=[10, 50, 1e9]
-                               # description='Monthly'  # TODO: NOT FOUND
+                               parasitemia_bins=[10, 50, 1e9],
+                               filename_suffix='Monthly'
                                )
 
 

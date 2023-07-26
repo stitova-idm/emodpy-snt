@@ -7,6 +7,7 @@ from typing import List
 from functools import partial
 from idmtools.builders import SimulationBuilder
 from idmtools.entities.simulation import Simulation
+from emodpy_malaria.reporters.builtin import add_report_event_counter
 from snt.helpers_add_interventions import add_all_interventions
 from snt.helpers_sim_setup import load_master_csv, habitat_scales, set_up_hfca
 from snt.utility.sweeping import set_param, ItvFn, CfgFn
@@ -28,7 +29,13 @@ def sweep_interventions(simulation: Simulation, func_list: List):
     for func in func_list:
         tags = func(simulation)
         if tags:
-            tags_updated.update(tags)
+            if isinstance(func, ItvFn):
+                fname = func.func.__name__
+                if fname == 'add_all_interventions':
+                    # add counter report
+                    add_report_event_counter(simulation.task, manifest, event_trigger_list=tags["events"])
+            else:
+                tags_updated.update(tags)
     return tags_updated
 
 
@@ -56,6 +63,9 @@ def get_sweep_builders(**kwargs):
     project_path = manifest.project_path
     scen_df = params.scen_df
     scen_index = params.scen_index
+
+    itn_decay_params = pd.read_csv(os.path.join(project_path, 'simulation_inputs', 'itn_discard_decay_params.csv'))
+    itn_use_seasonality = pd.read_csv(os.path.join(project_path, 'simulation_inputs', 'ITN_use_seasonality.csv'))
 
     # CM
     if (not pd.isna(scen_df.at[scen_index, 'CM_filename'])) and (not (scen_df.at[scen_index, 'CM_filename'] == '')):
@@ -89,9 +99,6 @@ def get_sweep_builders(**kwargs):
             os.path.join(project_path, 'simulation_inputs', '%s.csv' % scen_df.at[scen_index, 'EPI_ITN_filename']))
     else:
         itn_epi_df = pd.DataFrame()
-
-    itn_decay_params = pd.read_csv(os.path.join(project_path, 'simulation_inputs', 'itn_discard_decay_params.csv'))
-    itn_use_seasonality = pd.read_csv(os.path.join(project_path, 'simulation_inputs', 'ITN_use_seasonality.csv'))
     # IRS
     if (not pd.isna(scen_df.at[scen_index, 'IRS_filename'])) and (not (scen_df.at[scen_index, 'IRS_filename'] == '')):
         irs_df = pd.read_csv(
@@ -116,41 +123,38 @@ def get_sweep_builders(**kwargs):
         lhdf['archetype'].values  # make sure this matches the values used in the next step
     }
 
-    int_sweeps = []
-    for my_rep_admin in lhdf['archetype'].values:
-        for x in range(params.num_seeds):
-            for hab_scale in sweepspace[my_rep_admin]:
-                int_funcs = []
-                all_int = ItvFn(add_all_interventions,
-                                hfca=my_rep_admin,
-                                itn_decay_params=itn_decay_params,
-                                itn_use_seasonality=itn_use_seasonality,
-                                itn_anc_adult_birthday_years=params.itn_anc_adult_birthday_years,
-                                hs_df=hs_df,
-                                nmf_df=nmf_df,
-                                itn_df=itn_df,
-                                itn_anc_df=itn_anc_df,
-                                itn_epi_df=itn_epi_df,
-                                irs_df=irs_df,
-                                smc_df=smc_df)
-                hfca = CfgFn(set_up_hfca,
-                             manifest=manifest,
-                             hfca=my_rep_admin,
-                             archetype_hfca=master_df.at[my_rep_admin, 'seasonality_archetype'],
-                             pull_from_serialization=params.pull_from_serialization,
-                             ser_date=0,
-                             hdf=rel_abundance_df,
-                             lhdf=lhdf,
-                             population_size=params.population_size,
-                             hab_multiplier=hab_scale,
-                             run_number=x)
-                int_funcs.append(partial(set_param, param='Habitat_Multiplier', value=hab_scale))
-                int_funcs.append(partial(set_param, param='Run_Number', value=x))
-                int_funcs.append(hfca)
-                int_funcs.append(all_int)
+    funcs_list = [[CfgFn(set_up_hfca,
+                         manifest=manifest,
+                         hfca=my_rep_admin,
+                         archetype_hfca=master_df.at[my_rep_admin, 'seasonality_archetype'],
+                         pull_from_serialization=params.pull_from_serialization,
+                         ser_date=0,
+                         hdf=rel_abundance_df,
+                         lhdf=lhdf,
+                         population_size=params.population_size,
+                         hab_multiplier=hab_scale,
+                         run_number=x),
+                   ItvFn(add_all_interventions,
+                         hfca=my_rep_admin,
+                         itn_decay_params=itn_decay_params,
+                         itn_use_seasonality=itn_use_seasonality,
+                         itn_anc_adult_birthday_years=params.itn_anc_adult_birthday_years,
+                         hs_df=hs_df,
+                         nmf_df=nmf_df,
+                         itn_df=itn_df,
+                         itn_anc_df=itn_anc_df,
+                         itn_epi_df=itn_epi_df,
+                         irs_df=irs_df,
+                         smc_df=smc_df),
+                   partial(set_param, param='Run_Number', value=x),
+                   partial(set_param, param='Habitat_Multiplier', value=hab_scale),
+                   # TODO: ValueError: parameter 'Habitat_Multiplier' not in schema.
+                   ]
+                  for my_rep_admin in lhdf['archetype'].values
+                  for x in range(params.num_seeds)
+                  for hab_scale in sweepspace[my_rep_admin]
+                  ]
 
-                int_sweeps.append(int_funcs)
-
-    builder.add_sweep_definition(sweep_interventions, int_sweeps)
+    builder.add_sweep_definition(sweep_interventions, funcs_list)
 
     return [builder]

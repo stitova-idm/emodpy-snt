@@ -15,29 +15,29 @@ platform = None
 
 def _config_reports(task):
     """
-    Add reports
+    Add reports.
 
     Args:
         task: EMODTask
 
-    Returns: None
-
+    Returns:
+        None
     """
-    pass
+    # CUSTOM REPORTS
+    from emodpy_malaria.reporters.builtin import add_report_malaria_filtered
+    from emodpy_malaria.reporters.builtin import add_malaria_summary_report
 
+    add_report_malaria_filtered(task, manifest,
+                                start_day=(params.years - 3) * 365,
+                                end_day=params.years * 365)
 
-def _config_campaign(campaign):
-    """
-    Add interventions
-
-    Args:
-        campaign: emod_api.campaign
-
-    Returns: None
-
-    """
-    add_outbreak_individual(campaign, demographic_coverage=0.002, start_day=35, repetitions=-1,
-                            timesteps_between_repetitions=73)
+    add_malaria_summary_report(task, manifest,
+                               start_day=(params.years - 1) * 365,
+                               age_bins=[0.25, 5, 15, 125],
+                               reporting_interval=30,
+                               parasitemia_bins=[10, 50, 1e9]
+                               # description='Monthly'  # TODO: NOT FOUND
+                               )
 
 
 #####################################
@@ -46,17 +46,17 @@ def _config_campaign(campaign):
 
 def build_campaign():
     """
-    Adding required interventions
+    Adding required interventions.
 
     Returns:
         campaign object
     """
-
     import emod_api.campaign as campaign
     # passing in schema file to verify that everything is correct.
     campaign.schema_path = manifest.schema_file
 
-    _config_campaign(campaign)
+    add_outbreak_individual(campaign, demographic_coverage=0.002, start_day=35, repetitions=-1,
+                            timesteps_between_repetitions=73)
 
     return campaign
 
@@ -85,10 +85,10 @@ def set_config_parameters(config):
 
 def get_task(**kwargs):
     """
-    This function is designed to create and config a Task
+    This function is designed to create and config a Task.
 
     Args:
-        **kwargs: optional parameters
+        kwargs: optional parameters
 
     Returns:
         task

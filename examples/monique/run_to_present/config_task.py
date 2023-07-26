@@ -28,11 +28,11 @@ def _config_reports(task):
     for year in range(params.years):
         add_malaria_summary_report(task, manifest,
                                    start_day=365 * year,
+                                   end_day=365 * year + 365,
                                    age_bins=[0.25, 5, 15, 30, 50, 125],
                                    reporting_interval=30,
-                                   parasitemia_bins=[10, 50, 1e9]
-                                   # duration_days=365,                                     # TODO: NOT FOUND
-                                   # description='Monthly%d' % (year + params.start_year)   # TODO: NOT FOUND
+                                   parasitemia_bins=[10, 50, 1e9],
+                                   filename_suffix='Monthly%d' % (year + params.start_year)
                                    )
 
 

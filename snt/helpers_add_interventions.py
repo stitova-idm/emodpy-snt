@@ -16,8 +16,6 @@ from emodpy_malaria.interventions.vaccine import add_scheduled_vaccine, add_trig
 from emodpy_malaria.interventions.common import add_triggered_campaign_delay_event
 from emod_api.interventions.common import BroadcastEvent, DelayedIntervention
 
-# SVET - several notes marked 'svet'
-
 
 def add_hfca_hs(campaign, hs_df, hfca, seed_index=0):
     # df = hs_df[hs_df['repDS'] == hfca]
@@ -718,7 +716,8 @@ def add_epi_rtss(campaign, rtss_df):
                                   "Delay_Period_Gaussian_Mean": tp_time_trigger,
                                   "Delay_Period_Gaussian_Std_Dev": std}
         else:  # no delay
-            delay_distribution = None
+            delay_distribution = {"Delay_Period_Distribution": "CONSTANT_DISTRIBUTION",
+                                  "Delay_Period_Gaussian_Mean": tp_time_trigger}
 
         # TODO: Make EPI support booster1 and booster2
         if not vtype == 'booster':

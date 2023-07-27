@@ -20,17 +20,6 @@ def _print_params():
     print("pull_from_serialization: ", params.pull_from_serialization)
 
 
-def _pre_run(experiment: Experiment, **kwargs):
-    """
-    Add extra work before run experiment.
-    Args:
-        experiment: idmtools Experiment
-        kwargs: additional parameters
-    Return: additional parameters
-    """
-    pass
-
-
 def _post_run(experiment: Experiment, **kwargs):
     """
     Add extra work after run experiment.
@@ -78,7 +67,6 @@ def run_experiment(**kwargs):
     _print_params()
 
     experiment = _config_experiment(**kwargs)
-    _pre_run(experiment, **kwargs)
     experiment.run(wait_until_done=False, wait_on_done=False)
     _post_run(experiment, **kwargs)
 

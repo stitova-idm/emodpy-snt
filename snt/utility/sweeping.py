@@ -1,6 +1,6 @@
 import numpy as np
+from typing import Dict, Any, List
 from idmtools.entities.simulation import Simulation
-from typing import Dict, Any
 
 
 ##################################################
@@ -8,7 +8,7 @@ from typing import Dict, Any
 ##################################################
 def set_param(simulation: Simulation, param: str, value: Any) -> Dict[str, Any]:
     """
-    Set specific parameter value
+    Set specific parameter value.
     Args:
         simulation: idmtools Simulation
         param: parameter
@@ -17,15 +17,47 @@ def set_param(simulation: Simulation, param: str, value: Any) -> Dict[str, Any]:
     Returns:
         dict
     """
-    return simulation.task.set_parameter(param, value)
+    # return simulation.task.set_parameter(param, value)
+
+    try:
+        return simulation.task.set_parameter(param, value)
+    except ValueError:
+        if "parameters" in simulation.task.config:
+            config = simulation.task.config.parameters
+        else:
+            config = simulation.task.config
+
+        config[param] = value
+        return {param: value}
+
+
+def sweep_functions(simulation: Simulation, func_list: List) -> Dict[str, Any]:
+    """
+    Apply funcs on simulation.
+    Args:
+        simulation: idmtools Simulation
+        func_list: a list of functions
+
+    Returns:
+        dict of parameters
+    """
+    tags_updated = {}
+    for func in func_list:
+        tags = func(simulation)
+        if tags:
+            tags_updated.update(tags)
+    return tags_updated
 
 
 class ItvFn:
     """
+    Sweeping utility: works for sweeping on interventions.
     Requirements:
      - func is a method that takes campaign as first parameter
      - func return a dict
-     - if original is just returning an event, we need to make a wrapper
+
+    Returns:
+        dict
     """
 
     def __init__(self, func, *args, **kwargs):
@@ -65,9 +97,13 @@ class ItvFn:
 
 class CfgFn:
     """
+    Sweeping utility: works for sweeping on config parameters.
     Requirements:
      - func is a method that takes config as first parameter
      - func return a dict
+
+    Returns:
+        dict
     """
 
     def __init__(self, func, *args, **kwargs):
@@ -89,10 +125,13 @@ class CfgFn:
 
 class SwpFn:
     """
-    This works for sweeping on report, demographics, migrations and climate
+    Sweeping utility: works for sweeping on report, demographics, migrations and climate, etc.
     Requirements:
      - func is a method that takes task as first parameter
      - func return a dict
+
+    Returns:
+        dict
     """
 
     def __init__(self, func, *args, **kwargs):

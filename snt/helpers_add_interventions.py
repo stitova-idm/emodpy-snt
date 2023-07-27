@@ -7,17 +7,14 @@ from emodpy_malaria.interventions.usage_dependent_bednet import add_scheduled_us
     add_triggered_usage_dependent_bednet
 from emodpy_malaria.interventions.irs import add_scheduled_irs_housing_modification
 from emod_api.interventions.common import change_individual_property_triggered
-from emodpy_malaria.reporters.builtin import add_report_event_counter
 from emodpy_malaria.interventions.drug_campaign import add_drug_campaign
 from emodpy_malaria.interventions.diag_survey import add_diagnostic_survey
-from emodpy_snt.support_files.malaria_vaccdrug_campaigns import add_vaccdrug_campaign
+from snt.support_files.malaria_vaccdrug_campaigns import add_vaccdrug_campaign
 from emodpy_malaria.interventions.adherentdrug import adherent_drug
-from emodpy_snt.snt.helpers_sim_setup import update_smc_access_ips
+from snt.helpers_sim_setup import update_smc_access_ips
 from emodpy_malaria.interventions.vaccine import add_scheduled_vaccine, add_triggered_vaccine
 from emodpy_malaria.interventions.common import add_triggered_campaign_delay_event
 from emod_api.interventions.common import BroadcastEvent, DelayedIntervention
-
-# SVET - several notes marked 'svet'
 
 
 def add_hfca_hs(campaign, hs_df, hfca, seed_index=0):
@@ -183,8 +180,8 @@ def add_itn_from_file(campaign, row, itn_use_seasonality, itn_decay_params):
     itn_discard_config = {"Expiration_Period_Distribution": "LOG_NORMAL_DISTRIBUTION",
                           "Expiration_Period_Log_Normal_Mu": row['net_life_lognormal_mu'],
                           "Expiration_Period_Log_Normal_Sigma": row['net_life_lognormal_sigma']}
-    itn_decay_kill = itn_decay_params['kill_decay_time'][0]
-    itn_decay_block = itn_decay_params['block_decay_time'][0]
+    itn_decay_kill = itn_decay_params['kill_decay_time'][0].item()
+    itn_decay_block = itn_decay_params['block_decay_time'][0].item()
 
     # seasonality in ITN use
     seasonal_scales = itn_use_seasonality['itn_use_scalar']
@@ -220,10 +217,8 @@ def add_itn_from_file(campaign, row, itn_use_seasonality, itn_decay_params):
 
     add_scheduled_usage_dependent_bednet(campaign, start_day=row['simday'], demographic_coverage=coverage_all,
                                          killing_initial_effect=row['kill_initial'],
-                                         killing_box_duration=0,
                                          killing_decay_time_constant=itn_decay_kill,
                                          blocking_initial_effect=row['block_initial'],
-                                         blocking_box_duration=0,
                                          blocking_decay_time_constant=itn_decay_block,
                                          discard_config=itn_discard_config,
                                          age_dependence={'Times': [0, 5, 10, 15, 20],
@@ -253,7 +248,7 @@ def add_itn_from_file(campaign, row, itn_use_seasonality, itn_decay_params):
         if row['simday'] == 895:
             add_triggered_usage_dependent_bednet(campaign, start_day=0,
                                                  demographic_coverage=row['ITN coverage uncomplicated treatment'],
-                                                 trigger_condition_list=['Received_Treatment'],
+                                                 trigger_condition_list=['ReceivedTreatment'],
                                                  listening_duration=-1,
                                                  killing_initial_effect=row['kill_initial'],
                                                  killing_decay_time_constant=itn_decay_kill,
@@ -269,8 +264,8 @@ def add_itn_from_file(campaign, row, itn_use_seasonality, itn_decay_params):
 
 def add_birthday_routine_itn_from_file(campaign, itn_epi_df, itn_use_seasonality, itn_decay_params):
     # decay rates of killing and blocking
-    itn_decay_kill = itn_decay_params['kill_decay_time'][0]
-    itn_decay_block = itn_decay_params['block_decay_time'][0]
+    itn_decay_kill = itn_decay_params['kill_decay_time'][0].item()
+    itn_decay_block = itn_decay_params['block_decay_time'][0].item()
 
     # seasonality in ITN use
     seasonal_scales = itn_use_seasonality['itn_use_scalar']
@@ -315,8 +310,8 @@ def add_birthday_routine_itn_from_file(campaign, itn_epi_df, itn_use_seasonality
 
 def add_itn_anc(campaign, itn_anc_df, itn_anc_adult_birthday_years, itn_use_seasonality, itn_decay_params):
     # decay rates of killing and blocking
-    itn_decay_kill = itn_decay_params['kill_decay_time'][0]
-    itn_decay_block = itn_decay_params['block_decay_time'][0]
+    itn_decay_kill = itn_decay_params['kill_decay_time'][0].item()
+    itn_decay_block = itn_decay_params['block_decay_time'][0].item()
 
     # seasonality in ITN use
     seasonal_scales = itn_use_seasonality['itn_use_scalar']
@@ -362,6 +357,7 @@ def add_itn_anc(campaign, itn_anc_df, itn_anc_adult_birthday_years, itn_use_seas
                                                  target_age_min=(birthday_year - 0.5),
                                                  target_age_max=(birthday_year + 0.5),
                                                  target_gender="Female",
+                                                 trigger_condition_list=["HappyBirthday"],
                                                  killing_initial_effect=row['kill_initial'],
                                                  killing_decay_time_constant=itn_decay_kill,
                                                  blocking_initial_effect=row['block_initial'],
@@ -378,8 +374,8 @@ def add_monthly_chw_dist(campaign, row, itn_use_seasonality, itn_decay_params):
     itn_discard_config = {"Expiration_Period_Distribution": "LOG_NORMAL_DISTRIBUTION",
                           "Expiration_Period_Log_Normal_Mu": row['net_life_lognormal_mu'],
                           "Expiration_Period_Log_Normal_Sigma": row['net_life_lognormal_sigma']}
-    itn_decay_kill = itn_decay_params['kill_decay_time'][0]
-    itn_decay_block = itn_decay_params['block_decay_time'][0]
+    itn_decay_kill = itn_decay_params['kill_decay_time'][0].item()
+    itn_decay_block = itn_decay_params['block_decay_time'][0].item()
 
     # use-coverage by age
     itn_u5 = row['itn_u5']
@@ -430,8 +426,8 @@ def add_monthly_chw_dist(campaign, row, itn_use_seasonality, itn_decay_params):
 
 
 def add_annual_chw_dist(campaign, row, itn_use_seasonality, itn_decay_params):
-    itn_decay_kill = itn_decay_params['kill_decay_time'][0]
-    itn_decay_block = itn_decay_params['block_decay_time'][0]
+    itn_decay_kill = itn_decay_params['kill_decay_time'][0].item()
+    itn_decay_block = itn_decay_params['block_decay_time'][0].item()
 
     # use-coverage by age
     itn_u5 = row['itn_u5']
@@ -720,7 +716,8 @@ def add_epi_rtss(campaign, rtss_df):
                                   "Delay_Period_Gaussian_Mean": tp_time_trigger,
                                   "Delay_Period_Gaussian_Std_Dev": std}
         else:  # no delay
-            delay_distribution = None
+            delay_distribution = {"Delay_Period_Distribution": "CONSTANT_DISTRIBUTION",
+                                  "Delay_Period_Gaussian_Mean": tp_time_trigger}
 
         # TODO: Make EPI support booster1 and booster2
         if not vtype == 'booster':
@@ -740,9 +737,12 @@ def add_epi_rtss(campaign, rtss_df):
                                   start_day=start_days[0],
                                   trigger_condition_list=[event_name],
                                   intervention_name='RTSS',
+                                  broadcast_event='Received_Vaccine',
                                   vaccine_type="AquisitionBlocking",
                                   vaccine_initial_effect=init_eff,
-                                  vaccine_decay_time_constant=decay_t
+                                  vaccine_box_duration=0,
+                                  vaccine_decay_time_constant=decay_t,
+                                  efficacy_is_multiplicative=False
                                   )
         else:
             # triggered_campaign_delay_event only has option for constant delay, but we need different
@@ -762,8 +762,10 @@ def add_epi_rtss(campaign, rtss_df):
                                   trigger_condition_list=[event_name],
                                   ind_property_restrictions=[{'VaccineStatus': 'GotVaccine'}],
                                   intervention_name='RTSS',
+                                  broadcast_event='Received_Vaccine',
                                   vaccine_type="AquisitionBlocking",
                                   vaccine_initial_effect=init_eff,
+                                  vaccine_box_duration=0,
                                   vaccine_decay_time_constant=decay_t,
                                   efficacy_is_multiplicative=False
                                   )
@@ -786,6 +788,7 @@ def add_campaign_rtss(campaign, rtss_df):
                                   intervention_name='RTSS',
                                   vaccine_type="AquisitionBlocking",
                                   vaccine_initial_effect=row['initial_effect'],
+                                  vaccine_box_duration=0,
                                   vaccine_decay_time_constant=row['decay_time_constant'],
                                   efficacy_is_multiplicative=False)
 
@@ -802,6 +805,7 @@ def add_campaign_rtss(campaign, rtss_df):
                                   intervention_name='RTSS',
                                   vaccine_type="AquisitionBlocking",
                                   vaccine_initial_effect=row['initial_effect'],
+                                  vaccine_box_duration=0,
                                   vaccine_decay_time_constant=row['decay_time_constant'],
                                   efficacy_is_multiplicative=False)
         elif vtype == 'booster3':
@@ -817,6 +821,7 @@ def add_campaign_rtss(campaign, rtss_df):
                                   intervention_name='RTSS',
                                   vaccine_type="AquisitionBlocking",
                                   vaccine_initial_effect=row['initial_effect'],
+                                  vaccine_box_duration=0,
                                   vaccine_decay_time_constant=row['decay_time_constant'],
                                   efficacy_is_multiplicative=False)
         else:
@@ -831,6 +836,7 @@ def add_campaign_rtss(campaign, rtss_df):
                                   intervention_name='RTSS',
                                   vaccine_type="AquisitionBlocking",
                                   vaccine_initial_effect=row['initial_effect'],
+                                  vaccine_box_duration=0,
                                   vaccine_decay_time_constant=row['decay_time_constant'],
                                   efficacy_is_multiplicative=False)
 
@@ -895,7 +901,6 @@ def add_all_interventions(campaign, hfca, seed_index=1, hs_df=pd.DataFrame(), nm
         if has_irs > 0:
             event_list.append('Received_IRS')
     if not smc_df.empty:
-        # SVET - need to convert simulatin.helpers_sim_setup
         has_smc = update_smc_access_ips(campaign, smc_df=smc_df, hfca=hfca)
         if use_smc_vaccine_proxy:
             has_smc = add_hfca_vaccsmc(campaign, smc_df, hfca,
@@ -929,13 +934,10 @@ def add_all_interventions(campaign, hfca, seed_index=1, hs_df=pd.DataFrame(), nm
         # case management for malaria
         has_cm = add_hfca_hs(campaign, hs_df, hfca, seed_index=seed_index)
         if has_cm:
-            event_list.append('Received_Treatment')
+            event_list.append('ReceivedTreatment')
             event_list.append('Received_Severe_Treatment')
         # case management for NMFs
         add_nmf_hs(campaign, hs_df, nmf_df, hfca, seed_index=seed_index)
         event_list.append('Received_NMF_Treatment')
 
-    # SVET - can't add report event counter like that. Needs to be added after task is created
-    # add_report_event_counter(campaign, event_trigger_list=event_list, end_day=50 * 365)
-
-    return {}
+    return {"events": event_list}

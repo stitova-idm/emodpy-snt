@@ -4,13 +4,14 @@ import os
 import pandas as pd
 import numpy as np
 from dtk.interventions.outbreakindividual import recurring_outbreak
-from dtk.utils.core.DTKConfigBuilder import DTKConfigBuilder
+import emodpy_malaria.malaria_config as malaria_config
 from dtk.vector.species import update_species_param, set_species, set_larval_habitat
 from malaria.interventions.malaria_drugs import set_drug_param
 from malaria.reports.MalariaReport import add_filtered_report
 from simtools.Utilities.Experiments import retrieve_experiment
 
-def initialize_cb (years, serialize, defaults='MALARIA_SIM', yr_plusone=True,
+
+def initialize_cb (config, years, serialize, defaults='MALARIA_SIM', yr_plusone=True,
                    ser_time_step = None, event_reporter = False,
                    filtered_report = None, x_pop_scale=1):
     """Initialize config builder with preset params
@@ -46,18 +47,16 @@ def initialize_cb (years, serialize, defaults='MALARIA_SIM', yr_plusone=True,
     DTKConfigBuilder
     
     """
-    cb = DTKConfigBuilder.from_defaults(defaults)
 
+    config = malaria_config.set_team_defaults(config, manifest)
     # Run time
-    cb.update_params({'Simulation_Duration': years*365+yr_plusone})
+    config.parameters.Simulation_Duration = years*365+yr_plusone
     
     # Logging
-    cb.update_params({
-        'logLevel_JsonConfigurable' : 'ERROR',
-        'logLevel_VectorHabitat' : 'ERROR',
-        'logLevel_StandardEventCoordinator' : 'ERROR',
-        'logLevel_SusceptibilityMalaria' : 'ERROR'
-    })
+    config.parameters['logLevel_JsonConfigurable'] = 'ERROR'
+    config.parameters['logLevel_VectorHabitat'] = 'ERROR'
+    config.parameters['logLevel_StandardEventCoordinator'] = 'ERROR'
+    config.parameters['logLevel_SusceptibilityMalaria'] = 'ERROR'
 
     # Demographics
     cb.update_params({

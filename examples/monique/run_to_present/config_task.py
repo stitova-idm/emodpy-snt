@@ -1,8 +1,6 @@
 import os
 from pathlib import Path
 from emodpy import emod_task
-from emodpy_malaria.interventions.outbreak import add_outbreak_individual
-
 import manifest
 import params
 
@@ -16,28 +14,26 @@ platform = None
 def _config_reports(task):
     """
     Add reports.
-
     Args:
         task: EMODTask
-
-    Returns:
-        None
+    Returns: None
     """
-    # CUSTOM REPORTS
     from emodpy_malaria.reporters.builtin import add_report_malaria_filtered
     from emodpy_malaria.reporters.builtin import add_malaria_summary_report
 
     add_report_malaria_filtered(task, manifest,
-                                start_day=(params.years - 3) * 365,
+                                start_day=0,
                                 end_day=params.years * 365)
 
-    add_malaria_summary_report(task, manifest,
-                               start_day=(params.years - 1) * 365,
-                               age_bins=[0.25, 5, 15, 125],
-                               reporting_interval=30,
-                               parasitemia_bins=[10, 50, 1e9],
-                               filename_suffix='Monthly'
-                               )
+    for year in range(params.years):
+        add_malaria_summary_report(task, manifest,
+                                   start_day=365 * year,
+                                   end_day=365 * year + 365,
+                                   age_bins=[0.25, 5, 15, 30, 50, 125],
+                                   reporting_interval=30,
+                                   parasitemia_bins=[10, 50, 1e9],
+                                   filename_suffix='Monthly%d' % (year + params.start_year)
+                                   )
 
 
 #####################################
@@ -47,7 +43,6 @@ def _config_reports(task):
 def build_campaign():
     """
     Adding required interventions.
-
     Returns:
         campaign object
     """
@@ -55,6 +50,7 @@ def build_campaign():
     # passing in schema file to verify that everything is correct.
     campaign.schema_path = manifest.schema_file
 
+    from emodpy_malaria.interventions.outbreak import add_outbreak_individual
     add_outbreak_individual(campaign, demographic_coverage=0.002, start_day=35, repetitions=-1,
                             timesteps_between_repetitions=73)
 
@@ -64,10 +60,8 @@ def build_campaign():
 def set_config_parameters(config):
     """
     This function is a callback that is passed to emod-api.config to set parameters The Right Way.
-
     Args:
         config:
-
     Returns:
         configuration settings
     """
@@ -85,14 +79,11 @@ def set_config_parameters(config):
 
 def get_task(**kwargs):
     """
-    This function is designed to create and config a Task.
-
+    This function is designed to create and config a Task
     Args:
-        kwargs: optional parameters
-
+        **kwargs: optional parameters
     Returns:
         task
-
     """
     global platform
     platform = kwargs.get('platform', None)

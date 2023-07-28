@@ -1,14 +1,11 @@
+import os
+import datetime
 import pandas as pd
 import numpy as np
-from simtools.Analysis.BaseAnalyzers import BaseAnalyzer
-import datetime
-import os
-import sys
-sys.path.append('../')
+from idmtools.entities import IAnalyzer
 
 
-
-class VectorNumbersAnalyzer(BaseAnalyzer):
+class VectorNumbersAnalyzer(IAnalyzer):
 
     @classmethod
     def monthparser(self, x):
@@ -30,7 +27,7 @@ class VectorNumbersAnalyzer(BaseAnalyzer):
     # def filter(self, simulation):
     #     return simulation.status.name == 'Succeeded'
 
-    def select_simulation_data(self, data, simulation):
+    def map(self, data, simulation):
 
         simdata = pd.DataFrame({x: data[self.filenames[0]]['Channels'][x]['Data'] for x in self.inset_channels})
         simdata['Time'] = simdata.index
@@ -44,7 +41,7 @@ class VectorNumbersAnalyzer(BaseAnalyzer):
                 simdata[sweep_var] = simulation.tags[sweep_var]
         return simdata
 
-    def finalize(self, all_data):
+    def reduce(self, all_data):
 
         selected = [data for sim, data in all_data.items()]
         if len(selected) == 0:
@@ -57,9 +54,7 @@ class VectorNumbersAnalyzer(BaseAnalyzer):
         adf = pd.concat(selected).reset_index(drop=True)
         adf['date'] = adf.apply(lambda x: datetime.date(x['year'], x['month'], 1), axis=1)
 
-
         mean_channels = ['Adult Vectors']
 
         adf = adf.groupby(['admin_name', 'date', 'Run_Number'])[mean_channels].agg(np.mean).reset_index()
         adf.to_csv(os.path.join(self.working_dir, self.expt_name, 'vector_numbers_monthly.csv'), index=False)
-

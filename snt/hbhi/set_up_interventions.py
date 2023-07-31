@@ -7,7 +7,7 @@ from emodpy_malaria.interventions.adherentdrug import adherent_drug
 from emodpy_malaria.interventions.treatment_seeking import add_treatment_seeking
 from emodpy_malaria.interventions.diag_survey import add_diagnostic_survey
 from emodpy_malaria.interventions.drug_campaign import add_drug_campaign
-from emodpy_malaria.interventions.malaria_vaccdrug_campaigns import add_vaccdrug_campaign
+from snt.support_files.malaria_vaccdrug_campaigns import add_vaccdrug_campaign
 from emodpy_malaria.interventions.vaccine import add_scheduled_vaccine, _simple_vaccine
 from emod_api.interventions.common import BroadcastEvent, DelayedIntervention
 from emodpy_malaria.interventions.common import add_triggered_campaign_delay_event
@@ -179,14 +179,14 @@ class InterventionSuite:
             coverage_all = 1
         usages = [x / coverage_all for x in usages]
 
-        self.ITN_age_season_template(campaign, start=row['simday'],
+        self.itn_age_season_template(campaign, start=row['simday'],
                                      demographic_coverage=coverage_all,
                                      killing_rate=row['kill_rate'],
                                      blocking_rate=row['blocking_rate'],
                                      age_bin=self.itn_cov_age_bin,
                                      usages=[x * self.itn_leak_factor for x in usages])
 
-    def ITN_age_season_template(self, campaign, start, demographic_coverage,
+    def itn_age_season_template(self, campaign, start, demographic_coverage,
                                 killing_rate, blocking_rate,
                                 age_bin, usages, duration=-1,
                                 birth_triggered=False,
@@ -256,7 +256,7 @@ class InterventionSuite:
 
     def add_itn_antenatal_by_row(self, campaign, row):
         # for r, row in itn_anc_df.iterrows() :
-        self.ITN_age_season_template(campaign, start=row['simday'],
+        self.itn_age_season_template(campaign, start=row['simday'],
                                      demographic_coverage=row['coverage'],
                                      killing_rate=row['kill_rate'],
                                      blocking_rate=row['blocking_rate'],
@@ -266,7 +266,7 @@ class InterventionSuite:
 
     def add_itn_pregnant_by_row(self, campaign, row):
         for mm in range(self.itn_preg_max_months):
-            self.ITN_age_season_template(campaign, start=30 * mm,
+            self.itn_age_season_template(campaign, start=30 * mm,
                                          demographic_coverage=row['coverage'],
                                          killing_rate=row['kill_rate'],
                                          blocking_rate=row['blocking_rate'],
@@ -281,7 +281,7 @@ class InterventionSuite:
             coverage_all = 1
         usages = [x / coverage_all for x in usages]
 
-        self.ITN_age_season_template(campaign, start=0,
+        self.itn_age_season_template(campaign, start=0,
                                      demographic_coverage=row['coverage'],
                                      killing_rate=row['kill_rate'],
                                      blocking_rate=row['blocking_rate'],
@@ -296,7 +296,7 @@ class InterventionSuite:
             coverage_all = 1
         usages = [x / coverage_all for x in usages]
 
-        self.ITN_age_season_template(campaign, start=0,
+        self.itn_age_season_template(campaign, start=0,
                                      demographic_coverage=row['coverage'],
                                      killing_rate=row['kill_rate'],
                                      blocking_rate=row['blocking_rate'],
@@ -322,9 +322,9 @@ class InterventionSuite:
         else:
             max_smc_age = 5
         if self.smc_TAT_col in df.columns.values:
-            TAT = list(df[self.smc_TAT_col])[0]  # assume same for all rounds
+            tat = list(df[self.smc_TAT_col])[0]  # assume same for all rounds
         else:
-            TAT = 0  # assume kids with fever don't get SMC at all and are also not referred
+            tat = 0  # assume kids with fever don't get SMC at all and are also not referred
 
         coverage_col = self.smc_coverage_col
         agemins = self.smc_agemins
@@ -342,7 +342,7 @@ class InterventionSuite:
                                   ind_property_restrictions=[{'SMCAccess': access[i]}],
                                   receiving_drugs_event=False)  ## If False uses vaccSMC with automatic offset of 17 days, if True, uses vaccDrugSMC
 
-            if TAT:  # TODO
+            if tat:  # TODO
                 raise ValueError('TAT not yet implemented for vaccSMC')
 
         if self.smc_leakage and len(df) > 0:
@@ -394,9 +394,9 @@ class InterventionSuite:
             else:
                 max_smc_age = 5
             if self.smc_TAT_col in smc_df.columns.values:
-                TAT = row[self.smc_TAT_col]
+                tat = row[self.smc_TAT_col]
             else:
-                TAT = 0  # assume kids with fever don't get SMC at all and are also not referred
+                tat = 0  # assume kids with fever don't get SMC at all and are also not referred
 
             coverage_col = self.smc_coverage_col
             agemins = self.smc_agemins
@@ -415,7 +415,7 @@ class InterventionSuite:
                                   trigger_condition_list=['No_SMC_Fever'],
                                   ind_property_restrictions=[{'SMCAccess': access[i]}],
                                   adherent_drug_configs=adherent_drug_configs)
-                if TAT:
+                if tat:
                     add_drug_campaign(campaign, 'MDA', drug_code='AL', start_days=[row['simday']],
                                       coverage=row[coverage_col[i]],
                                       target_group={'agemin': agemins[i],
@@ -442,7 +442,6 @@ class InterventionSuite:
         if self.smc_leakage and len(df) > 0:
             # leakage to between age max of SMC group and user defined max
             leak_agemin = np.max(agemax_actual)
-            # SMC same as ITPi?
             add_drug_campaign(campaign, 'SMC', drug_code, start_days=df['simday'].values,  # Might throw error?
                               coverage=self.smc_leak_coverage,
                               target_group={'agemin': leak_agemin, 'agemax': self.smc_leak_agemax})
@@ -502,7 +501,7 @@ class InterventionSuite:
                                              ip_restrictions=[{'VaccineStatus': 'GotBooster1'}],
                                              blackout=False)
 
-    def add_EPI_rtss(self, campaign, rtss_df):
+    def add_epi_rtss(self, campaign, rtss_df):
         start_days = list(rtss_df[self.rtss_start_col].unique())
         coverage_levels = list(rtss_df[self.rtss_coverage_col].values)
         rtss_types = list(rtss_df[self.rtss_type_col].values)
@@ -632,7 +631,7 @@ class InterventionSuite:
         # First, process EPI style distribution
         rtss_df1 = rtss_df[rtss_df['deploy_type'] == 'EPI']
         if len(rtss_df1) > 0:
-            self.add_EPI_rtss(campaign, rtss_df1)
+            self.add_epi_rtss(campaign, rtss_df1)
 
         # Second, process campaign style distribution
         rtss_df2 = rtss_df[rtss_df['deploy_type'] == 'campaign']
@@ -670,20 +669,19 @@ class InterventionSuite:
 
     def add_ds_pmc(self, campaign, pmc_df, my_ds):
         pmc_df = pmc_df[pmc_df[self.pmc_ds_col].str.upper() == my_ds.upper()]
-        EPI = pmc_df['deploy_type'].unique()[0] == 'EPI'
+        epi = pmc_df['deploy_type'].unique()[0] == 'EPI'
         drug_code = pmc_df['drug_code'].unique()[0]
 
         if "num_IIV_groups" in pmc_df:
-            num_IIV_groups = pmc_df['num_IIV_groups'].unique()[0]
-            pmc_IIV = True
+            num_iiv_groups = pmc_df['num_IIV_groups'].unique()[0]
+            pmc_iiv = True
         else:
-            num_IIV_groups = None
-            pmc_IIV = False
+            num_iiv_groups = None
+            pmc_iiv = False
 
-        if not EPI:
+        if not epi:
             """Use campaign-style deployment"""
             for r, row in pmc_df.iterrows():
-                # SVET: SMC same as IPTi?
                 add_drug_campaign(campaign, campaign_type='SMC',
                                   drug_code=drug_code,
                                   coverage=row[self.pmc_coverage_col],
@@ -704,12 +702,12 @@ class InterventionSuite:
             pmc_touchpoints = list(pmc_df[self.pmc_touchpoint_col].values)
             start_days = list(pmc_df[self.pmc_start_col].unique())
             delay_distribution_name = list(pmc_df['distribution_name'].values)[0]
-            Std_Dev_list = list(pmc_df['distribution_std'].values)
+            std_dev_list = list(pmc_df['distribution_std'].values)
             pmc_event_names = [f'PMC_{x + 1}' for x in range(len(pmc_touchpoints))]
 
-            if not pmc_IIV:
+            if not pmc_iiv:
                 for tp_time_trigger, coverage, event_name, std in zip(pmc_touchpoints, coverage_levels,
-                                                                      pmc_event_names, Std_Dev_list):
+                                                                      pmc_event_names, std_dev_list):
 
                     if delay_distribution_name == "LOG_NORMAL_DISTRIBUTION":
                         delay_distribution = {"Delay_Period_Distribution": "LOG_NORMAL_DISTRIBUTION",
@@ -725,7 +723,6 @@ class InterventionSuite:
                                               "Delay_Period_Constant": tp_time_trigger}
 
                     if pmc_correlated_cov:
-                        # NO PMC? itpi>
                         add_drug_campaign(campaign,
                                           campaign_type='PMC',
                                           drug_code=drug_code,
@@ -744,9 +741,9 @@ class InterventionSuite:
                                           trigger_name=event_name)
             else:
                 """When running with IIV birth triggered event needs to happen separate from drug campaigns"""
-                IIV_groups = ["Group%d" % x for x in range(num_IIV_groups)]
+                iiv_groups = ["Group%d" % x for x in range(num_iiv_groups)]
                 for tp_time_trigger, coverage, event_name, std in zip(pmc_touchpoints, coverage_levels,
-                                                                      pmc_event_names, Std_Dev_list):
+                                                                      pmc_event_names, std_dev_list):
 
                     if delay_distribution_name == "LOG_NORMAL_DISTRIBUTION":
                         delay_distribution = {"Delay_Period_Distribution": "LOG_NORMAL_DISTRIBUTION",
@@ -772,7 +769,7 @@ class InterventionSuite:
                                                        demographic_coverage=coverage,
                                                        individual_intervention=delayed_event)
 
-                    for index, val in enumerate(IIV_groups):
+                    for index, val in enumerate(iiv_groups):
                         if drug_code == 'SDX_PYR':
                             drug_doses = [['SulfadoxinePyrimethamine_%d' % index]]
                         elif drug_code == 'SP':
@@ -875,9 +872,9 @@ def update_smc_access_ips(campaign, smc_df, my_ds):
     # before the first SMC round in each year, change the SMCAccess IP for the U5 and O5 age groups
     # simdays of the first rounds (change IPs one week before)
     first_round_days = df.loc[df['round'] == 1, 'simday'].values
-    change_IP_days = [first_round_days[yy] - 7 for yy in range(len(first_round_days))]
+    change_ip_days = [first_round_days[yy] - 7 for yy in range(len(first_round_days))]
 
-    for rr in change_IP_days:
+    for rr in change_ip_days:
         change_individual_property_scheduled(campaign, start_day=rr, coverage=1,
                                              new_ip_key='SMCAccess', new_ip_value="Low",
                                              target_age_min=0, target_age_max=5)

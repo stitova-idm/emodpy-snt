@@ -5,10 +5,10 @@ from emodpy_malaria.interventions.drug_campaign import add_drug_campaign
 from emodpy_malaria.reporters.builtin import add_malaria_summary_report
 
 
-def add_nmf_trt(cb, num_years, start_year,
+def add_nmf_trt(campaign, num_years, start_year,
                 coverage=0.0038, diagnostic_threshold=5):
     for nmf_years in range(num_years):
-        add_drug_campaign(cb, 'MSAT', 'AL',
+        add_drug_campaign(campaign, 'MSAT', 'AL',
                           start_days=[1 + 365 * nmf_years + start_year * 365],
                           coverage=coverage,
                           repetitions=365, tsteps_btwn_repetitions=1,

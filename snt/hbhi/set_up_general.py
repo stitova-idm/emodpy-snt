@@ -8,47 +8,34 @@ import manifest
 import emod_api.config.default_from_schema_no_validation as dfs
 from emodpy_malaria.interventions.outbreak import add_outbreak_individual
 from emodpy_malaria.reporters.builtin import add_spatial_report_malaria_filtered, add_event_recorder
-from simtools.Utilities.Experiments import retrieve_experiment
+from idmtools.core.platform_factory import Platform
 
 
 def initialize_config(config, years, serialize, yr_plusone=True,
-                      ser_time_step=None, event_reporter=False,
-                      filtered_report=None, x_pop_scale=1):
+                      ser_time_step=None, x_pop_scale=1):
     """Initialize config builder with preset params
 
     Start a (default) MALARIA_SIM config builder with presets including:
     durations, logging, demographics, serialization, vector and reports.
 
-    Parameters
-    ----------
+    Parameters:
+    config:
     years: int
         Simulation duration in years
     serialize: bool
         To serialize simulation outcome or not
-    defaults: str, default: 'MALARIA_SIM'
-        No idea if it works for other defaults...
     yr_plusone: bool, default: True
         For serialization, simulation duration needs to plus one day to work
     ser_time_step: list of int, default: None
         A list defining the sim day(s) to serialize the population. When set
         to None, serialization will occur at `years*365`
-    event_reporter: bool, default = False
-        If True, switch on 'Report_Event_Recorder' with default event of
-        'Received_Severe_Treatment'
-    filtered_report: int, default = None
-        Number of years (counting from last) to add filtered report on. None
-        means no filtered report added
     x_pop_scale: int, default = 1
         Scaling factor for simulation population,
         applies to x_Base_Population, x_Birth, x_Temporary_Larval_Habitat
 
-    Returns
-    -------
-    DTKConfigBuilder
-    
+    Returns:
+        config
     """
-
-    config = malaria_config.set_team_defaults(config, manifest)
     # Run time
     config.parameters.Simulation_Duration = years * 365 + yr_plusone
 
@@ -93,20 +80,29 @@ def initialize_config(config, years, serialize, yr_plusone=True,
     config.parameters.Report_Detection_Threshold_Blood_Smear_Parasites = 50
     config.parameters.Report_Parasite_Smear_Sensitivity = 0.02,  # 50/uL
     config.parameters.Report_Detection_Threshold_Blood_Smear_Parasites = 50
+    return config
 
-    if event_reporter:
-        cb.update_params({
-            "Report_Event_Recorder": 1,
-            "Report_Event_Recorder_Individual_Properties": [],
-            "Report_Event_Recorder_Events": ['Received_Severe_Treatment',
-                                             # 'Received_Treatment', 'NewClinicalCase',
-                                             # 'NewSevereCase', 'Received_Campaign_Drugs',
-                                             # 'No_SMC_Fever'
-                                             ],
-            "Report_Event_Recorder_Ignore_Events_In_List": 0
-        })
-    # Zhaowei
-    # needs to be moved to after task:
+
+def initialize_reports(task, event_reporter: bool = False, filtered_report: int = None,
+                       years: float = None, yr_plusone: bool = True):
+    """
+
+    Args:
+        task: Task to which to add the reporter, if left as None, reporter is returned (used for unittests)
+        event_reporter: bool, default = False
+            If True, switch on 'Report_Event_Recorder' with default event of
+            'Received_Severe_Treatment'
+        filtered_report: int, default = None
+            Number of years (counting from last) to add filtered report on. None
+            means no filtered report added
+        years: number of years you want filtered report to collect information
+        yr_plusone: bool, default: True
+            For serialization, simulation duration needs to plus one day to work
+
+    Returns:
+        Nothing
+    """
+
     if event_reporter:
         add_event_recorder(task, event_list=['Received_Severe_Treatment',
                                              # 'Received_Treatment', 'NewClinicalCase',
@@ -119,30 +115,28 @@ def initialize_config(config, years, serialize, yr_plusone=True,
         start = yr_plusone + (years - num_year) * 365
         end = yr_plusone + years * 365
         # SpatialReportMalariaFiltered
-        add_spatial_report_malaria_filtered(task, manifest, start_day=start, end_day=end)
-
-    return config
+        add_spatial_report_malaria_filtered(task, manifest, start_day=int(start), end_day=int(end))
 
 
 def load_master_csv(projectpath, file=None, country=None):
     if file is None:
         if country in ['burkina', 'guinea']:
             fname = country + "_DS_pop.csv"
-            DS_Name = 'DS_Name'
+            ds_name = 'DS_Name'
         elif country == 'nigeria':
             fname = country + "_LGA_pop.csv"
-            DS_Name = 'LGA'
+            ds_name = 'LGA'
         elif country is None:
             raise Exception("Must specify either the file or the country.")
         else:
             raise Exception("Only burkina, guinea and nigeria are supported for country specification.")
     else:
         fname = file
-        DS_Name = 'DS_Name'
+        ds_name = 'DS_Name'
 
     master_csv = os.path.join(projectpath, fname)
     df = pd.read_csv(master_csv, encoding='latin')
-    df['DS_Name'] = df[DS_Name].str.normalize('NFKD').str.encode('ascii', errors='ignore').str.decode('utf-8')
+    df['DS_Name'] = df[ds_name].str.normalize('NFKD').str.encode('ascii', errors='ignore').str.decode('utf-8')
     df = df.set_index('DS_Name')
     return df
 
@@ -168,34 +162,33 @@ def set_input_files(config, my_ds, archetype_ds=None, demographic_suffix='',
     config.parameters['District_Sanitaire'] = 'my_ds'
     config.parameters['Archetype'] = 'archetype_ds'
 
-    #  Zhaowei - move this somewhere else?
     if demographic_suffix is not None:
-        cb.update_params({
-            'Demographics_Filenames': [os.path.join(ds, '%s_demographics%s.json' % (ds, demographic_suffix))]
-        })
+        config.parameters.Demographics_Filenames = [
+            os.path.join(ds, '%s_demographics%s.json' % (ds, demographic_suffix))]
 
-    # Zhaowei - also somewhere else?
     if climate_suffix is not None:
         if climate_prefix:
-            cb.update_params({
-                "Air_Temperature_Filename": os.path.join(ds, '%s_air_temperature_daily%s.bin' % (ds, climate_suffix)),
-                "Land_Temperature_Filename": os.path.join(ds, '%s_air_temperature_daily%s.bin' % (ds, climate_suffix)),
-                "Rainfall_Filename": os.path.join(ds, '%s_rainfall_daily%s.bin' % (ds, climate_suffix)),
-                "Relative_Humidity_Filename": os.path.join(ds,
-                                                           '%s_relative_humidity_daily%s.bin' % (ds, climate_suffix))
-            })
+            config.parameters.Air_Temperature_Filename = os.path.join(ds, '%s_air_temperature_daily%s.bin' % (
+                ds, climate_suffix))
+            config.parameters.Land_Temperature_Filename = os.path.join(ds, '%s_air_temperature_daily%s.bin' % (
+                ds, climate_suffix))
+            config.parameters.Rainfall_Filename = os.path.join(ds, '%s_rainfall_daily%s.bin' % (ds, climate_suffix))
+            config.parameters.Relative_Humidity_Filename = os.path.join(ds, '%s_relative_humidity_daily%s.bin' % (
+                ds, climate_suffix))
+
         else:
-            cb.update_params({
-                "Air_Temperature_Filename": os.path.join(ds, 'air_temperature_daily%s.bin' % climate_suffix),
-                "Land_Temperature_Filename": os.path.join(ds, 'air_temperature_daily%s.bin' % climate_suffix),
-                "Rainfall_Filename": os.path.join(ds, 'rainfall_daily%s.bin' % climate_suffix),
-                "Relative_Humidity_Filename": os.path.join(ds, 'relative_humidity_daily%s.bin' % climate_suffix)
-            })
+            config.parameters.Air_Temperature_Filename = os.path.join(ds,
+                                                                      'air_temperature_daily%s.bin' % climate_suffix)
+            config.parameters.Land_Temperature_Filename = os.path.join(ds,
+                                                                       'air_temperature_daily%s.bin' % climate_suffix)
+            config.parameters.Rainfall_Filename = os.path.join(ds, 'rainfall_daily%s.bin' % climate_suffix)
+            config.parameters.Relative_Humidity_Filename = os.path.join(ds,
+                                                                        'relative_humidity_daily%s.bin' % climate_suffix)
 
     return {'DS_Name': my_ds}
 
 
-def setup_ds(config, campaign, my_ds, archetype_ds=None,
+def setup_ds(config, platform, campaign, my_ds, archetype_ds=None,
              pull_from_serialization=False,
              burnin_id='', ser_date=50 * 365,
              burnin_fname='',
@@ -205,7 +198,7 @@ def setup_ds(config, campaign, my_ds, archetype_ds=None,
              climate_prefix=True,
              use_arch_input=True,
              hab_multiplier=1, run_number=-1,
-             parser_default='HPC', DS_Name='DS_Name',
+             ds_name='DS_Name',
              serialize_match_tag=None,
              serialize_match_val=None):
     """Setting an individual DS up to add to config builder
@@ -217,7 +210,7 @@ def setup_ds(config, campaign, my_ds, archetype_ds=None,
 
     Parameters
     ----------
-    cb : DTKConfigBuilder
+    config : DTKConfigBuilder
     my_ds : str
     archetype_ds : str, default: None
         The archetype DS of `my_ds`
@@ -254,9 +247,7 @@ def setup_ds(config, campaign, my_ds, archetype_ds=None,
     run_number : int, default: -1
         `run_number` will be matched with `run_number` of the serialized population
         from the burnin experiment
-    parser_default : {'HPC', 'NUCLUSTER', 'LOCAL'}
-        Specifies where does the serialized population live
-    DS_Name : str, default: 'DS_Name'
+    ds_name : str, default: 'DS_Name'
         The variable name that tags a simulation run to a DS; Could be 'LGA' in the
         case of Nigeria
     
@@ -270,14 +261,13 @@ def setup_ds(config, campaign, my_ds, archetype_ds=None,
     # For backward compatibility, from_arch supersedes use_arch_burnin
     if from_arch is not None:
         use_arch_burnin = from_arch
-    set_input_files(campaign, my_ds, archetype_ds, demographic_suffix, climate_suffix, climate_prefix, use_arch_input)
+    set_input_files(config, my_ds, archetype_ds, demographic_suffix, climate_suffix, climate_prefix, use_arch_input)
     if not archetype_ds:
         archetype_ds = my_ds
 
     if rel_abund_df is not None:
-        set_habitats(campaign, rel_abund_df, lhdf, archetype_ds, abs(hab_multiplier))  # To be fixed
+        set_habitats(config, manifest, rel_abund_df, lhdf, archetype_ds, abs(hab_multiplier))  # To be fixed
 
-    # Zhaowei
     if pull_from_serialization:
         # serialize_match check
         if serialize_match_tag:
@@ -289,27 +279,19 @@ def setup_ds(config, campaign, my_ds, archetype_ds=None,
         else:
             serialize_match_tag = ['Habitat_Multiplier', 'Run_Number']
             serialize_match_val = [hab_multiplier, run_number]
-        # Zhaowei
-        if parser_default == 'HPC':
-            from simtools.Utilities.COMPSUtilities import COMPS_login
-            COMPS_login('https://comps.idmod.org')
-        # print("building from pickup")
 
         # serialization
         # print("retrieving burnin")
         if burnin_id:
-            expt = retrieve_experiment(burnin_id)
-            # creating data with all the simulation tags
-            ser_df = pd.DataFrame([x.tags for x in expt.simulations])
-            # getting paths for all the sims
-            ser_df["outpath"] = pd.Series([sim.get_path() for sim in expt.simulations])
+            # SVET - where do we get the platform?
+            ser_df = platform.create_sim_directory_df(burnin_id)  # TODO: or we can pass ser_df in
         else:
             ser_df = pd.read_csv(burnin_fname)
 
         if use_arch_burnin:
-            ser_df = ser_df[ser_df[DS_Name] == archetype_ds]
+            ser_df = ser_df[ser_df[ds_name] == archetype_ds]
         else:
-            ser_df = ser_df[ser_df[DS_Name] == my_ds]
+            ser_df = ser_df[ser_df[ds_name] == my_ds]
 
         sdf = ser_df.copy()
         for t, v in zip(serialize_match_tag, serialize_match_val):
@@ -328,14 +310,26 @@ def setup_ds(config, campaign, my_ds, archetype_ds=None,
         config.parameters.Serialization_Mask_Node_Read = 0
     # else: do nothing, we're already not serializing
 
-    add_outbreak_individual(campaign, start_day=182, demographic_coverage=0.01, repetitions=-1,
-                            timesteps_between_repetitions=365)
-
-    return {DS_Name: my_ds,
+    return {ds_name: my_ds,
             'archetype': archetype_ds}
 
 
-def set_habitats(config, hdf, lhdf, archetype_ds, hab_multiplier, my_ds=None):
+def add_recurring_outbreak(campaign):
+    """
+        Adds a recurring outbreak that starts on day 182, affects 0.01 of the populations,
+        repeats every 365 days and repeats forever.
+    Args:
+        campaign: campaign object to which the intervention will be added, and schema_path container
+
+    Returns:
+
+    """
+
+    add_outbreak_individual(campaign, start_day=182, demographic_coverage=0.01, repetitions=-1,
+                            timesteps_between_repetitions=365)
+
+
+def set_habitats(config, manifest, hdf, lhdf, archetype_ds, hab_multiplier, my_ds=None):
     if my_ds is not None:
         ds = my_ds
     else:
@@ -419,6 +413,6 @@ def set_spaq_params(cb):
     malaria_config.set_drug_param(cb, 'Amodiaquine', "Drug_Decay_T2", 37.5)
     malaria_config.set_drug_param(cb, 'Amodiaquine', "Drug_Vd", 15.6)
     malaria_config.set_drug_param(cb, 'Amodiaquine', "Fractional_Dose_By_Upper_Age",
-                   [{"Upper_Age_In_Years": 1, "Fraction_Of_Adult_Dose": 0.376}])
+                                  [{"Upper_Age_In_Years": 1, "Fraction_Of_Adult_Dose": 0.376}])
 
     return {'Drug': "User-defined (set_spaq_params)"}

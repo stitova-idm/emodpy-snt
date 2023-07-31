@@ -400,19 +400,19 @@ def load_rel_abund_df(projectpath):
     return rel_abund_df
 
 
-def set_spaq_params(cb):
-    malaria_config.set_drug_param(cb, 'Amodiaquine', "Drug_PKPD_C50", 1)
-    malaria_config.set_drug_param(cb, 'Amodiaquine', "Max_Drug_IRBC_Kill", 0.23)
-    malaria_config.set_drug_param(cb, 'Sulfadoxine', "Drug_PKPD_C50", 0.2 * 6)
-    malaria_config.set_drug_param(cb, 'Sulfadoxine', "Max_Drug_IRBC_Kill", 0.506 * 0.675)
-    malaria_config.set_drug_param(cb, 'Pyrimethamine', "Drug_PKPD_C50", 8 * 6)
-    malaria_config.set_drug_param(cb, 'Pyrimethamine', "Max_Drug_IRBC_Kill", 0.6 * 0.6417)
+def set_spaq_params(config):
+    malaria_config.set_drug_param(config, 'Amodiaquine', "Drug_PKPD_C50", 1)
+    malaria_config.set_drug_param(config, 'Amodiaquine', "Max_Drug_IRBC_Kill", 0.23)
+    malaria_config.set_drug_param(config, 'Sulfadoxine', "Drug_PKPD_C50", 0.2 * 6)
+    malaria_config.set_drug_param(config, 'Sulfadoxine', "Max_Drug_IRBC_Kill", 0.506 * 0.675)
+    malaria_config.set_drug_param(config, 'Pyrimethamine', "Drug_PKPD_C50", 8 * 6)
+    malaria_config.set_drug_param(config, 'Pyrimethamine', "Max_Drug_IRBC_Kill", 0.6 * 0.6417)
 
-    malaria_config.set_drug_param(cb, 'Amodiaquine', "Drug_Cmax", 95)
-    malaria_config.set_drug_param(cb, 'Amodiaquine', "Drug_Decay_T1", 0.775)
-    malaria_config.set_drug_param(cb, 'Amodiaquine', "Drug_Decay_T2", 37.5)
-    malaria_config.set_drug_param(cb, 'Amodiaquine', "Drug_Vd", 15.6)
-    malaria_config.set_drug_param(cb, 'Amodiaquine', "Fractional_Dose_By_Upper_Age",
+    malaria_config.set_drug_param(config, 'Amodiaquine', "Drug_Cmax", 95)
+    malaria_config.set_drug_param(config, 'Amodiaquine', "Drug_Decay_T1", 0.775)
+    malaria_config.set_drug_param(config, 'Amodiaquine', "Drug_Decay_T2", 37.5)
+    malaria_config.set_drug_param(config, 'Amodiaquine', "Drug_Vd", 15.6)
+    malaria_config.set_drug_param(config, 'Amodiaquine', "Fractional_Dose_By_Upper_Age",
                                   [{"Upper_Age_In_Years": 1, "Fraction_Of_Adult_Dose": 0.376}])
 
     return {'Drug': "User-defined (set_spaq_params)"}

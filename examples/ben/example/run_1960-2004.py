@@ -51,8 +51,8 @@ rel_abund_df = pd.read_csv(os.path.join(iopath, rel_abund_csv))
 rel_abund_df = rel_abund_df.set_index('DS_Name')
 
 samp_df = pd.read_csv(os.path.join(iopath, 'simulation_priors/selected_particles.csv'))
-ds_list = master_df.archetype.unique()
-
+samp_df = samp_df[samp_df.DS_Name.isin(['Anie', 'Doufelgou'])]
+ds_list = samp_df.archetype.unique()
 
 # BUILDER
 list_of_sims = []

@@ -26,7 +26,7 @@ homepath = os.path.expanduser('~')
 user = homepath.split('/')[2]
 expname = f'{user}_dtknu_2005-2022'
 
-num_seeds = 3
+num_seeds = 1
 years = 18  # 2005 to 2022 year
 ser_num_seeds = 1
 ser_date = 45*365
@@ -34,7 +34,7 @@ serialize = True
 pull_from_serialization = True
 use_arch_burnin = True
 
-burnin_id = "2023_06_13_20_38_23_696396"
+burnin_id = "2023_07_27_13_50_24_524201"
 
 homepath = os.path.expanduser('~')
 user = homepath.split('/')[2]
@@ -122,6 +122,7 @@ rel_abund_df = pd.read_csv(os.path.join(iopath, rel_abund_csv))
 rel_abund_df = rel_abund_df.set_index('DS_Name')
 
 samp_df = pd.read_csv(samp_csv)
+samp_df = samp_df[samp_df.DS_Name.isin(['Anie', 'Doufelgou'])]
 ds_list = samp_df.DS_Name.unique()
 
 # BUILDER

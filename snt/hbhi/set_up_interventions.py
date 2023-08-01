@@ -535,7 +535,7 @@ class InterventionSuite:
             broadcast_event = BroadcastEvent(campaign, event_name)
             broadcast_event_vaccine = BroadcastEvent(campaign, 'Received_Vaccine')
             vaccine = _simple_vaccine(campaign, intervention_name="RTSS",
-                                      vaccine_type="AquisitionBlocking",
+                                      vaccine_type="AcquisitionBlocking",
                                       vaccine_initial_effect=init_eff,
                                       vaccine_box_duration=0,
                                       vaccine_decay_time_constant=decay_t,
@@ -573,7 +573,7 @@ class InterventionSuite:
                                       ind_property_restrictions=[{'VaccineStatus': 'GotVaccine'}],
                                       broadcast_event=broadcast,
                                       intervention_name="RTSS",
-                                      vaccine_type="AquisitionBlocking",
+                                      vaccine_type="AcquisitionBlocking",
                                       vaccine_initial_effect=row[self.rtss_init_eff_col],
                                       vaccine_box_duration=0,
                                       vaccine_decay_time_constant=row[self.rtss_decay_t_col],
@@ -589,7 +589,7 @@ class InterventionSuite:
                                       broadcast_event=broadcast,
                                       ind_property_restrictions=[{'VaccineStatus': 'GotBooster1'}],
                                       intervention_name="RTSS",
-                                      vaccine_type="AquisitionBlocking",
+                                      vaccine_type="AcquisitionBlocking",
                                       vaccine_initial_effect=row[self.rtss_init_eff_col],
                                       vaccine_box_duration=0,
                                       vaccine_decay_time_constant=row[self.rtss_decay_t_col],
@@ -605,7 +605,7 @@ class InterventionSuite:
                                       broadcast_event=broadcast,
                                       ind_property_restrictions=[{'VaccineStatus': 'GotBooster2'}],
                                       intervention_name="RTSS",
-                                      vaccine_type="AquisitionBlocking",
+                                      vaccine_type="AcquisitionBlocking",
                                       vaccine_initial_effect=row[self.rtss_init_eff_col],
                                       vaccine_box_duration=0,
                                       vaccine_decay_time_constant=row[self.rtss_decay_t_col],
@@ -620,7 +620,7 @@ class InterventionSuite:
                                       target_age_max=row[self.rtss_max_age_col],
                                       broadcast_event=broadcast,
                                       intervention_name="RTSS",
-                                      vaccine_type="AquisitionBlocking",
+                                      vaccine_type="AcquisitionBlocking",
                                       vaccine_initial_effect=row[self.rtss_init_eff_col],
                                       vaccine_box_duration=0,
                                       vaccine_decay_time_constant=row[self.rtss_decay_t_col],
@@ -804,10 +804,7 @@ def add_all_interventions(campaign, int_suite, my_ds, hs_df=pd.DataFrame(),
                           rtss_df=pd.DataFrame(),
                           pmc_df=pd.DataFrame(),
                           addtl_smc_func=None,
-                          nmf_as_default=True,
-                          add_event_report=True,
-                          rep_start=0,
-                          rep_duration=10000):  # itn_anc_df, irs_df
+                          nmf_as_default=True):
     if nmf_as_default:
         event_list = ['Received_NMF_Treatment']
     else:

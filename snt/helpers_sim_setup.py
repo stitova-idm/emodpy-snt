@@ -5,6 +5,7 @@ from emodpy_malaria.malaria_config import configure_linear_spline, set_species_p
 from emod_api.interventions.common import change_individual_property_scheduled
 import emod_api.config.default_from_schema_no_validation as dfs
 
+
 def update_basic_params(config, manifest, project_path):
     vector_species = ['arabiensis', 'funestus', 'gambiae']
     add_species(config, manifest, vector_species)
@@ -21,7 +22,7 @@ def update_basic_params(config, manifest, project_path):
     config.parameters.Report_Detection_Threshold_Blood_Smear_Parasites = 0
     config.parameters.Report_Parasite_Smear_Sensitivity = 0.01  # number of microliters of blood examined
     config.parameters.Incubation_Period_Distribution = 'CONSTANT_DISTRIBUTION'
-    config.parameters.Incubation_Period_Constant = 3  # parameter shortened from 7 to yield a 12-13 day incubation period
+    config.parameters.Incubation_Period_Constant = 7  # parameter shortened from 7 to yield a 12-13 day incubation period
 
     # read in and set vector bionomics
     vector_bionomics = pd.read_csv(os.path.join(project_path, 'simulation_inputs', 'vector_bionomics.csv'))
@@ -35,10 +36,8 @@ def update_basic_params(config, manifest, project_path):
     # added to match the old config to the new config
     config.parameters.Enable_Natural_Mortality = 1
     config.parameters.Enable_Initial_Prevalence = 1
-    config.parameters.Base_Air_Temperature = 22
+    config.parameters.Base_Air_Temperature = 27
     config.parameters.Enable_Vector_Migration = 0
-
-
 
 
 def habitat_scales(project_path):
@@ -73,7 +72,6 @@ def set_up_hfca(config, manifest, hfca, archetype_hfca=None,
                 pull_from_serialization=False, ser_date=50 * 365,
                 hdf=None, lhdf=None, population_size=1000,
                 hab_multiplier=-1, run_number=-1, use_arch_burnin=False, ser_df=pd.DataFrame()):
-
     set_input_files(config, hfca, archetype_hfca, population_size)
     if not archetype_hfca:
         archetype_hfca = hfca
@@ -147,7 +145,6 @@ def set_habitats(config, manifest, hfca, hdf, lhdf, archetype_hfca, hab_multipli
 
 
 def load_spline_and_scale_factors(lhdf, archetype_hfca):
-
     lhdf = lhdf.set_index('archetype')
     my_spline = [lhdf.at[archetype_hfca, 'MonthVal%d' % x] for x in range(1, 13)]
     maxvalue = lhdf.at[archetype_hfca, 'MaxHab']

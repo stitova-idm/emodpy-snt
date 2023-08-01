@@ -4,14 +4,12 @@ import os
 import pandas as pd
 import numpy as np
 import emodpy_malaria.malaria_config as malaria_config
-import manifest
 import emod_api.config.default_from_schema_no_validation as dfs
 from emodpy_malaria.interventions.outbreak import add_outbreak_individual
 from emodpy_malaria.reporters.builtin import add_spatial_report_malaria_filtered, add_event_recorder
-from idmtools.core.platform_factory import Platform
 
 
-def initialize_config(config, years, serialize, yr_plusone=True,
+def initialize_config(config, manifest, years, serialize, yr_plusone=True,
                       ser_time_step=None, x_pop_scale=1):
     """Initialize config builder with preset params
 
@@ -83,7 +81,7 @@ def initialize_config(config, years, serialize, yr_plusone=True,
     return config
 
 
-def initialize_reports(task, event_reporter: bool = False, filtered_report: int = None,
+def initialize_reports(task, manifest, event_reporter: bool = False, filtered_report: int = None,
                        years: float = None, yr_plusone: bool = True):
     """
 
@@ -188,7 +186,7 @@ def set_input_files(config, my_ds, archetype_ds=None, demographic_suffix='',
     return {'DS_Name': my_ds}
 
 
-def setup_ds(config, platform, campaign, my_ds, archetype_ds=None,
+def setup_ds(config, platform, manifest, my_ds, archetype_ds=None,
              pull_from_serialization=False,
              burnin_id='', ser_date=50 * 365,
              burnin_fname='',
@@ -210,7 +208,9 @@ def setup_ds(config, platform, campaign, my_ds, archetype_ds=None,
 
     Parameters
     ----------
-    config : DTKConfigBuilder
+    config: schema-backed config dictionary, written to config.json
+    platform:
+    manifest:
     my_ds : str
     archetype_ds : str, default: None
         The archetype DS of `my_ds`
@@ -250,6 +250,8 @@ def setup_ds(config, platform, campaign, my_ds, archetype_ds=None,
     ds_name : str, default: 'DS_Name'
         The variable name that tags a simulation run to a DS; Could be 'LGA' in the
         case of Nigeria
+    serialize_match_val:
+    serialize_match_tag:
     
     Returns
     -------
@@ -283,7 +285,6 @@ def setup_ds(config, platform, campaign, my_ds, archetype_ds=None,
         # serialization
         # print("retrieving burnin")
         if burnin_id:
-            # SVET - where do we get the platform?
             ser_df = platform.create_sim_directory_df(burnin_id)  # TODO: or we can pass ser_df in
         else:
             ser_df = pd.read_csv(burnin_fname)

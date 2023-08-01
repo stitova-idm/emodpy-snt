@@ -54,7 +54,6 @@ def initialize_config(config, manifest, years, serialize, yr_plusone=True,
         ser_time_step = [365 * years]
     if serialize:
         config.parameters.Serialization_Time_Steps = ser_time_step
-        config.parameters.Serialization_Type = "TIMESTEP"
         config.parameters.Serialized_Population_Writing_Type = "TIMESTEP"
         config.parameters.Serialization_Mask_Node_Write = 0
         config.parameters.Serialization_Precision = "REDUCED"
@@ -76,7 +75,7 @@ def initialize_config(config, manifest, years, serialize, yr_plusone=True,
     config.parameters.Enable_Property_Output = 0
     config.parameters.Enable_Vector_Species_Report = 0
     config.parameters.Report_Detection_Threshold_Blood_Smear_Parasites = 50
-    config.parameters.Report_Parasite_Smear_Sensitivity = 0.02,  # 50/uL
+    config.parameters.Report_Parasite_Smear_Sensitivity = 0.02  # 50/uL
     config.parameters.Report_Detection_Threshold_Blood_Smear_Parasites = 50
     return config
 

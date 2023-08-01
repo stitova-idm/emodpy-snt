@@ -36,7 +36,7 @@ def update_basic_params(config, manifest, project_path):
     # added to match the old config to the new config
     config.parameters.Enable_Natural_Mortality = 1
     config.parameters.Enable_Initial_Prevalence = 1
-    config.parameters.Base_Air_Temperature = 27
+    config.parameters.Base_Air_Temperature = 22
     config.parameters.Enable_Vector_Migration = 0
 
 

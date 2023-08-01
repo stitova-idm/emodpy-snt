@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
 from emodpy_malaria.interventions.irs import add_scheduled_irs_housing_modification
-from emodpy_malaria.interventions.usage_dependent_bednet import add_triggered_usage_dependent_bednet
+from emodpy_malaria.interventions.usage_dependent_bednet import add_triggered_usage_dependent_bednet, \
+    add_scheduled_usage_dependent_bednet
 from emod_api.interventions.common import change_individual_property_triggered, change_individual_property_scheduled
 from emodpy_malaria.interventions.adherentdrug import adherent_drug
 from emodpy_malaria.interventions.treatment_seeking import add_treatment_seeking
@@ -220,7 +221,7 @@ class InterventionSuite:
                                                  listening_duration=duration,
                                                  trigger_condition_list=["Births"],
                                                  ind_property_restrictions=ind_property_restrictions)
-        else:
+        elif trigger_condition_list:
             add_triggered_usage_dependent_bednet(campaign, start_day=start,
                                                  demographic_coverage=demographic_coverage,
                                                  killing_initial_effect=killing_rate,
@@ -236,6 +237,21 @@ class InterventionSuite:
                                                                       "Values": seasonal_scales},
                                                  listening_duration=duration,
                                                  trigger_condition_list=trigger_condition_list,
+                                                 ind_property_restrictions=ind_property_restrictions)
+        else:
+            add_scheduled_usage_dependent_bednet(campaign, start_day=start,
+                                                 demographic_coverage=demographic_coverage,
+                                                 killing_initial_effect=killing_rate,
+                                                 killing_decay_time_constant=1460,
+                                                 killing_box_duration=0,
+                                                 blocking_initial_effect=blocking_rate,
+                                                 blocking_decay_time_constant=730,
+                                                 blocking_box_duration=0,
+                                                 discard_config=discard_config,
+                                                 age_dependence={'Times': age_bin,
+                                                                 'Values': usages},
+                                                 seasonal_dependence={"Times": seasonal_times,
+                                                                      "Values": seasonal_scales},
                                                  ind_property_restrictions=ind_property_restrictions)
 
     def adjust_itn_seasonals(self, simday):

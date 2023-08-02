@@ -13,12 +13,10 @@ rel_abund_csv = 'simulation_inputs/DS_vector_rel_abundance.csv'
 samp_csv = os.path.join(iopath, 'simulation_priors/selected_particles.csv')
 
 homepath = os.path.expanduser('~')
-# # user = homepath.split('/')[2]         # on linux
-# user = homepath.split('\\')[2]          # on windows
 user = Path(homepath).name
 expname = f'{user}_dtknu_1960-2004'
 
-num_seeds = 1  # TODO ZDU: not used
+num_seeds = 1
 years = 45
 serialize = True
 pull_from_serialization = False

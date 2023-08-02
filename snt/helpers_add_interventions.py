@@ -1,7 +1,6 @@
 import warnings
 import pandas as pd
 import numpy as np
-
 from emodpy_malaria.interventions.treatment_seeking import add_treatment_seeking
 from emodpy_malaria.interventions.usage_dependent_bednet import add_scheduled_usage_dependent_bednet, \
     add_triggered_usage_dependent_bednet
@@ -514,7 +513,6 @@ def add_hfca_vaccsmc(campaign, smc_df, hfca, effective_coverage_resistance_multi
             access_list = ['High', 'Low']
 
         for ii in range(len(cov_list)):
-
             add_vaccdrug_campaign(campaign, campaign_type='SMC', start_days=[row['simday']],
                                   coverages=cov_list[ii],
                                   target_group={'agemin': age_min_list[ii],
@@ -537,7 +535,7 @@ def smc_adherent_configuration(campaign, adherence, sp_resist_day1_multiply):
                                             sp_resist_day1_multiply,  # for day 1
                                             adherence,  # day 2
                                             adherence  # day 3
-                                            ]
+                                        ]
                                         )
     return smc_adherent_config
 
@@ -887,7 +885,8 @@ def add_ds_vaccpmc(campaign, pmc_df, hfca):
     return len(pmc_df)
 
 
-def add_all_interventions(campaign, hfca, seed_index=1, hs_df=pd.DataFrame(), nmf_df=pd.DataFrame(), itn_df=pd.DataFrame(),
+def add_all_interventions(campaign, hfca, seed_index=1, hs_df=pd.DataFrame(), nmf_df=pd.DataFrame(),
+                          itn_df=pd.DataFrame(),
                           itn_anc_df=pd.DataFrame(), itn_use_seasonality=pd.DataFrame(),
                           itn_decay_params=pd.DataFrame(),
                           itn_anc_adult_birthday_years=None, itn_epi_df=pd.DataFrame(),

@@ -1,8 +1,7 @@
-import copy
-from logging import exception
 import os
 import pandas as pd
 import numpy as np
+from pathlib import Path
 import emodpy_malaria.malaria_config as malaria_config
 import emod_api.config.default_from_schema_no_validation as dfs
 from emodpy_malaria.interventions.outbreak import add_outbreak_individual
@@ -11,7 +10,8 @@ from emodpy_malaria.reporters.builtin import add_spatial_report_malaria_filtered
 
 def initialize_config(config, manifest, years, serialize, yr_plusone=True,
                       ser_time_step=None, x_pop_scale=1):
-    """Initialize config builder with preset params
+    """
+    Initialize config builder with preset params.
 
     Start a (default) MALARIA_SIM config builder with presets including:
     durations, logging, demographics, serialization, vector and reports.
@@ -83,7 +83,7 @@ def initialize_config(config, manifest, years, serialize, yr_plusone=True,
 def initialize_reports(task, manifest, event_reporter: bool = False, filtered_report: int = None,
                        years: float = None, yr_plusone: bool = True):
     """
-
+    Initialize reports.
     Args:
         task: Task to which to add the reporter, if left as None, reporter is returned (used for unittests)
         event_reporter: bool, default = False
@@ -185,7 +185,68 @@ def set_input_files(config, my_ds, archetype_ds=None, demographic_suffix='',
     return {'DS_Name': my_ds}
 
 
-def setup_ds(config, platform, manifest, my_ds, archetype_ds=None,
+def add_input_files(task, iopath, my_ds, archetype_ds=None, demographic_suffix='',
+                    climate_suffix='', climate_prefix=True, use_archetype=True):
+    """
+    Add assets corresponding to the filename parameters set in set_input_files.
+    Args:
+        task:
+        iopath:
+        my_ds:
+        archetype_ds:
+        demographic_suffix:
+        climate_suffix:
+        climate_prefix:
+        use_archetype:
+
+    Returns:
+        None
+    """
+    if archetype_ds is None:
+        archetype_ds = my_ds
+
+    if demographic_suffix is not None:
+        if not demographic_suffix.startswith('_') and not demographic_suffix == '':
+            demographic_suffix = '_' + demographic_suffix
+
+    if climate_suffix is not None:
+        if not climate_suffix.startswith('_') and not climate_suffix == '':
+            climate_suffix = '_' + climate_suffix
+
+    if use_archetype:
+        ds = archetype_ds
+    else:
+        ds = my_ds
+
+    if demographic_suffix is not None:
+        demog_path = os.path.join(ds, f'{ds}_demographics{demographic_suffix}.json')
+        task.common_assets.add_asset(os.path.join(iopath, 'simulation_inputs', demog_path),
+                                     relative_path=str(Path(demog_path).parent), fail_on_duplicate=False)
+
+    if climate_suffix is not None:
+        if climate_prefix:
+            file_path = os.path.join(ds, f'{ds}_air_temperature_daily{climate_suffix}.bin')
+            task.common_assets.add_asset(os.path.join(iopath, 'simulation_inputs', file_path),
+                                         relative_path=str(Path(file_path).parent), fail_on_duplicate=False)
+            file_path = os.path.join(ds, f'{ds}_rainfall_daily{climate_suffix}.bin')
+            task.common_assets.add_asset(os.path.join(iopath, 'simulation_inputs', file_path),
+                                         relative_path=str(Path(file_path).parent), fail_on_duplicate=False)
+            file_path = os.path.join(ds, f'{ds}_relative_humidity_daily{climate_suffix}.bin')
+            task.common_assets.add_asset(os.path.join(iopath, 'simulation_inputs', file_path),
+                                         relative_path=str(Path(file_path).parent), fail_on_duplicate=False)
+        else:
+            file_path = os.path.join(ds, f'air_temperature_daily{climate_suffix}.bin')
+            task.common_assets.add_asset(os.path.join(iopath, 'simulation_inputs', file_path),
+                                         relative_path=str(Path(file_path).parent), fail_on_duplicate=False)
+            file_path = os.path.join(ds, f'rainfall_daily{climate_suffix}.bin')
+            task.common_assets.add_asset(os.path.join(iopath, 'simulation_inputs', file_path),
+                                         relative_path=str(Path(file_path).parent), fail_on_duplicate=False)
+            file_path = os.path.join(ds, f'relative_humidity_daily{climate_suffix}.bin')
+            task.common_assets.add_asset(os.path.join(iopath, 'simulation_inputs', file_path),
+                                         relative_path=str(Path(file_path).parent), fail_on_duplicate=False)
+
+
+def setup_ds(config, manifest, platform, my_ds, archetype_ds=None,
              pull_from_serialization=False,
              burnin_id='', ser_date=50 * 365,
              burnin_fname='',
@@ -198,7 +259,8 @@ def setup_ds(config, platform, manifest, my_ds, archetype_ds=None,
              ds_name='DS_Name',
              serialize_match_tag=None,
              serialize_match_val=None):
-    """Setting an individual DS up to add to config builder
+    """
+    Setting an individual DS up to add to config builder
 
     Given a DS, pull its archetype, demographic, climate and vector files, 
     its corresponding serialized population (if applicable) and other info

@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import numpy as np
+import emodpy_malaria.malaria_config as malaria_config
 from emodpy_malaria.malaria_config import configure_linear_spline, set_species_param, add_species
 from emod_api.interventions.common import change_individual_property_scheduled
 import emod_api.config.default_from_schema_no_validation as dfs
@@ -214,6 +215,22 @@ def update_smc_access_ips(campaign, hfca, smc_df):
                                                  target_age_min=5, target_age_max=120)
 
     return {'admin_name': hfca}
+
+
+def set_drug_params(config):
+    # Amodaquine
+    malaria_config.set_drug_param(config, 'Amodiaquine', "Drug_Cmax", 270)
+    malaria_config.set_drug_param(config, 'Amodiaquine', "Drug_Decay_T1", 0.7)
+    malaria_config.set_drug_param(config, 'Amodiaquine', "Drug_Decay_T2", 15.9)
+    malaria_config.set_drug_param(config, 'Amodiaquine', "Drug_PKPD_C50", 55)
+    malaria_config.set_drug_param(config, 'Amodiaquine', "Drug_Vd", 1)
+    malaria_config.set_drug_param(config, 'Amodiaquine', "Max_Drug_IRBC_Kill", 0.2)
+
+    # SulfadoxinePyrimethamine
+    malaria_config.set_drug_param(config, 'SulfadoxinePyrimethamine', "Drug_Decay_T1", 11.5)
+    malaria_config.set_drug_param(config, 'SulfadoxinePyrimethamine', "Drug_Decay_T2", 11.5)
+    malaria_config.set_drug_param(config, 'SulfadoxinePyrimethamine', "Drug_PKPD_C50", 0.9)
+    malaria_config.set_drug_param(config, 'SulfadoxinePyrimethamine', "Max_Drug_IRBC_Kill", 0.28)
 
 
 if __name__ == "__main__":

@@ -1,11 +1,11 @@
 import os
+import datetime
 import numpy as np
 import pandas as pd
-from simtools.Analysis.BaseAnalyzers import BaseAnalyzer
-import datetime
-import sys
+from idmtools.entities import IAnalyzer
 
-class MonthlyPfPRAnalyzerU5(BaseAnalyzer):
+
+class MonthlyPfPRAnalyzerU5(IAnalyzer):
 
     def __init__(self, expt_name, sweep_variables=None, working_dir='./', start_year=2020, end_year=2023,
                  burnin=None, filter_exists=False):
@@ -64,12 +64,12 @@ class MonthlyPfPRAnalyzerU5(BaseAnalyzer):
                     adf[sweep_var] = simulation.tags[sweep_var]
                 except:
                     adf[sweep_var] = '-'.join([str(x) for x in simulation.tags[sweep_var]])
-            elif sweep_var == 'Run_Number' :
+            elif sweep_var == 'Run_Number':
                 adf[sweep_var] = 0
 
         return adf
 
-    def finalize(self, all_data):
+    def reduce(self, all_data):
 
         selected = [data for sim, data in all_data.items()]
         if len(selected) == 0:
@@ -86,7 +86,8 @@ class MonthlyPfPRAnalyzerU5(BaseAnalyzer):
             adf = adf[adf['year'] > self.start_year + self.burnin]
         adf.to_csv((os.path.join(self.working_dir, 'U5_PfPR_ClinicalIncidence.csv')), index=False)
 
-class MonthlyPfPRITNAnalyzer(BaseAnalyzer):
+
+class MonthlyPfPRITNAnalyzer(IAnalyzer):
 
     def __init__(self, expt_name, sweep_variables=None, working_dir="."):
         super(MonthlyPfPRITNAnalyzer, self).__init__(working_dir=working_dir,
@@ -95,12 +96,12 @@ class MonthlyPfPRITNAnalyzer(BaseAnalyzer):
                                                      )
         self.sweep_variables = sweep_variables or ["Run_Number"]
         self.expt_name = expt_name
-        self.mult_param = ['Habitat_Multiplier']#, 'x_Temporary_Larval_Habitat']
+        self.mult_param = ['Habitat_Multiplier']  # , 'x_Temporary_Larval_Habitat']
 
     # def filter(self, simulation):
     #     return simulation.tags["DS_Name_for_ITN"] == 'Dubreka'
 
-    def select_simulation_data(self, data, simulation):
+    def map(self, data, simulation):
 
         d = data[self.filenames[0]]['DataByTimeAndAgeBins']['PfPR by Age Bin'][:12]
         pfpr = [x[1] for x in d]
@@ -115,7 +116,7 @@ class MonthlyPfPRITNAnalyzer(BaseAnalyzer):
                 simdata[sweep_var] = simulation.tags[sweep_var]
         return simdata
 
-    def finalize(self, all_data):
+    def reduce(self, all_data):
 
         selected = [data for sim, data in all_data.items()]
         if len(selected) == 0:
@@ -133,7 +134,8 @@ class MonthlyPfPRITNAnalyzer(BaseAnalyzer):
         all_df = all_df.sort_values(by=grpby_var)
         all_df.to_csv(os.path.join(self.working_dir, '%s.csv' % self.expt_name), index=False)
 
-class MonthlyTreatedCasesAnalyzer(BaseAnalyzer):
+
+class MonthlyTreatedCasesAnalyzer(IAnalyzer):
 
     @classmethod
     def monthparser(self, x):
@@ -154,7 +156,7 @@ class MonthlyTreatedCasesAnalyzer(BaseAnalyzer):
         self.start_year = start_year
         self.end_year = end_year
 
-    def select_simulation_data(self, data, simulation):
+    def map(self, data, simulation):
         simdata = pd.DataFrame({x: data[self.filenames[1]]['Channels'][x]['Data'] for x in self.inset_channels})
         simdata['Time'] = simdata.index
         if self.channels:
@@ -182,7 +184,7 @@ class MonthlyTreatedCasesAnalyzer(BaseAnalyzer):
                 simdata[sweep_var] = simulation.tags[sweep_var]
         return simdata
 
-    def finalize(self, all_data):
+    def reduce(self, all_data):
 
         selected = [data for sim, data in all_data.items()]
         if len(selected) == 0:
@@ -191,10 +193,10 @@ class MonthlyTreatedCasesAnalyzer(BaseAnalyzer):
 
         adf = pd.concat(selected).reset_index(drop=True)
         adf.to_csv(os.path.join(self.working_dir, 'All_Age_Monthly_Cases.csv'), index=False)
-        print('\nSaving output at ' +  os.path.join(self.working_dir, 'All_Age_Monthly_Cases.csv'))
+        print('\nSaving output at ' + os.path.join(self.working_dir, 'All_Age_Monthly_Cases.csv'))
 
 
-class AnnualAgebinPfPRAnalyzer(BaseAnalyzer):
+class AnnualAgebinPfPRAnalyzer(IAnalyzer):
 
     def __init__(self, expt_name, sweep_variables=None, working_dir='./', start_year=2005,
                  end_year=2019, burnin=None):
@@ -208,7 +210,7 @@ class AnnualAgebinPfPRAnalyzer(BaseAnalyzer):
         self.end_year = end_year
         self.burnin = burnin
 
-    def select_simulation_data(self, data, simulation):
+    def map(self, data, simulation):
 
         adf = pd.DataFrame()
 
@@ -228,7 +230,7 @@ class AnnualAgebinPfPRAnalyzer(BaseAnalyzer):
             d = data[self.filenames[0]]['DataByTimeAndAgeBins']['Average Population by Age Bin'][:nyears]
             pop = [x[age] for x in d]
 
-            simdata = pd.DataFrame({'year': range(self.start_year, self.end_year+1),
+            simdata = pd.DataFrame({'year': range(self.start_year, self.end_year + 1),
                                     'PfPR': pfpr,
                                     'Cases': clinical_cases,
                                     'Severe cases': severe_cases,
@@ -244,12 +246,12 @@ class AnnualAgebinPfPRAnalyzer(BaseAnalyzer):
                     adf[sweep_var] = simulation.tags[sweep_var]
                 except:
                     adf[sweep_var] = '-'.join([str(x) for x in simulation.tags[sweep_var]])
-            elif sweep_var == 'Run_Number' :
+            elif sweep_var == 'Run_Number':
                 adf[sweep_var] = 0
 
         return adf
 
-    def finalize(self, all_data):
+    def reduce(self, all_data):
 
         selected = [data for sim, data in all_data.items()]
         if len(selected) == 0:
@@ -265,10 +267,11 @@ class AnnualAgebinPfPRAnalyzer(BaseAnalyzer):
         # Discard early years used as burnin
         if self.burnin is not None:
             adf = adf[adf['year'] >= self.start_year + self.burnin]
-        #adf = adf.loc[adf['agebin'] <= 100]
+        # adf = adf.loc[adf['agebin'] <= 100]
         adf.to_csv(os.path.join(self.working_dir, 'Agebin_PfPR_ClinicalIncidence_annual.csv'), index=False)
 
-class MonthlyAgebinPfPRAnalyzer(BaseAnalyzer):
+
+class MonthlyAgebinPfPRAnalyzer(IAnalyzer):
 
     def __init__(self, expt_name, sweep_variables=None, working_dir='./', start_year=2020, end_year=2023,
                  burnin=None, filter_exists=False):
@@ -291,7 +294,8 @@ class MonthlyAgebinPfPRAnalyzer(BaseAnalyzer):
             return os.path.exists(file)
         else:
             return True
-    def select_simulation_data(self, data, simulation):
+
+    def map(self, data, simulation):
 
         adf = pd.DataFrame()
 
@@ -326,12 +330,12 @@ class MonthlyAgebinPfPRAnalyzer(BaseAnalyzer):
                     adf[sweep_var] = simulation.tags[sweep_var]
                 except:
                     adf[sweep_var] = '-'.join([str(x) for x in simulation.tags[sweep_var]])
-            elif sweep_var == 'Run_Number' :
+            elif sweep_var == 'Run_Number':
                 adf[sweep_var] = 0
 
         return adf
 
-    def finalize(self, all_data):
+    def reduce(self, all_data):
 
         selected = [data for sim, data in all_data.items()]
         if len(selected) == 0:
@@ -347,10 +351,11 @@ class MonthlyAgebinPfPRAnalyzer(BaseAnalyzer):
         # Discard early years used as burnin
         if self.burnin is not None:
             adf = adf[adf['year'] >= self.start_year + self.burnin]
-        #adf = adf.loc[adf['agebin'] <= 100]
+        # adf = adf.loc[adf['agebin'] <= 100]
         adf.to_csv(os.path.join(self.working_dir, 'Agebin_PfPR_ClinicalIncidence_monthly.csv'), index=False)
 
-class MonthlyInsetAnalyzer(BaseAnalyzer):
+
+class MonthlyInsetAnalyzer(IAnalyzer):
 
     @classmethod
     def monthparser(self, x):
@@ -368,24 +373,24 @@ class MonthlyInsetAnalyzer(BaseAnalyzer):
         self.rdf = rdf
         self.expt_name = expt_name
 
-    def select_simulation_data(self, data, simulation):
+    def map(self, data, simulation):
 
-        simdata = pd.DataFrame( { x : data[self.filenames[0]]['Channels'][x]['Data'] for x in self.channels })
+        simdata = pd.DataFrame({x: data[self.filenames[0]]['Channels'][x]['Data'] for x in self.channels})
         # simdata = simdata[-365:]
         simdata['Time'] = simdata.index
         simdata['Day'] = simdata['Time'] % 365
         simdata = simdata.groupby('Day').agg(np.mean).reset_index()
-        simdata['Month'] = simdata['Day'].apply(lambda x: self.monthparser((x+1) % 365))
+        simdata['Month'] = simdata['Day'].apply(lambda x: self.monthparser((x + 1) % 365))
 
         for sweep_var in self.sweep_variables:
             if sweep_var in simulation.tags.keys():
-                if sweep_var == 'Vector_Species_Names' :
+                if sweep_var == 'Vector_Species_Names':
                     simdata[sweep_var] = 'funestus' if 'funestus' in simulation.tags[sweep_var] else 'no funestus'
-                else :
+                else:
                     simdata[sweep_var] = simulation.tags[sweep_var]
         return simdata
 
-    def finalize(self, all_data):
+    def reduce(self, all_data):
 
         selected = [data for sim, data in all_data.items()]
         if len(selected) == 0:
@@ -396,13 +401,13 @@ class MonthlyInsetAnalyzer(BaseAnalyzer):
         adf.to_csv(os.path.join(self.working_dir, 'monthly_inset.csv'), index=False)
 
 
-class DailyBitesAnalyzer(BaseAnalyzer):
+class DailyBitesAnalyzer(IAnalyzer):
 
     def __init__(self, expt_name, channels=None, rdf=pd.DataFrame(), sweep_variables=None, working_dir=".",
-                 firstlast = 'first'):
+                 firstlast='first'):
         super(DailyBitesAnalyzer, self).__init__(working_dir=working_dir,
                                                  filenames=["output/ReportMalariaFiltered.json"]
-                                                   )
+                                                 )
         self.sweep_variables = sweep_variables or ["DS_Name", "Run_Number"]
         self.channels = channels or ['Daily Bites per Human']
         self.rdf = rdf
@@ -411,10 +416,10 @@ class DailyBitesAnalyzer(BaseAnalyzer):
 
     def filter(self, simulation):
         file = os.path.join(simulation.get_path(), self.filenames[0])
-        return os.path.exists(file) 
+        return os.path.exists(file)
 
-    def select_simulation_data(self, data, simulation):
-        simdata = pd.DataFrame( { x : data[self.filenames[0]]['Channels'][x]['Data'] for x in self.channels })
+    def map(self, data, simulation):
+        simdata = pd.DataFrame({x: data[self.filenames[0]]['Channels'][x]['Data'] for x in self.channels})
         if self.firstlast == 'first':
             simdata = simdata[0:365]
         else:
@@ -426,7 +431,7 @@ class DailyBitesAnalyzer(BaseAnalyzer):
                 simdata[sweep_var] = simulation.tags[sweep_var]
         return simdata
 
-    def finalize(self, all_data):
+    def reduce(self, all_data):
 
         selected = [data for sim, data in all_data.items()]
         if len(selected) == 0:
@@ -437,14 +442,14 @@ class DailyBitesAnalyzer(BaseAnalyzer):
         adf.to_csv(os.path.join(self.working_dir, 'daily_bites.csv'), index=False)
 
 
-class annualSevereTreatedByAgeAnalyzer(BaseAnalyzer):
+class annualSevereTreatedByAgeAnalyzer(IAnalyzer):
 
     def __init__(self, expt_name, event_name='Received_Severe_Treatment', agebins=None,
                  sweep_variables=None, working_dir=".", start_year=2010, end_year=2020,
                  ds_col='LGA'):
         super(annualSevereTreatedByAgeAnalyzer, self).__init__(working_dir=working_dir,
-                                                                filenames=["output/ReportEventRecorder.csv"]
-                                                                )
+                                                               filenames=["output/ReportEventRecorder.csv"]
+                                                               )
         self.sweep_variables = sweep_variables or ["LGA", "Run_Number"]
         self.event_name = event_name
         self.agebins = agebins or [1, 5, 125]
@@ -456,7 +461,7 @@ class annualSevereTreatedByAgeAnalyzer(BaseAnalyzer):
     # def filter(self, simulation):
     #     return simulation.tags["LGA"] == 'Ushongo'
 
-    def select_simulation_data(self, data, simulation):
+    def map(self, data, simulation):
 
         output_data = data[self.filenames[0]].copy()
         output_data = output_data[output_data['Event_Name'] == self.event_name]
@@ -486,7 +491,7 @@ class annualSevereTreatedByAgeAnalyzer(BaseAnalyzer):
             simdata = pd.DataFrame(columns=['year', self.event_name] + self.sweep_variables)
         return simdata
 
-    def finalize(self, all_data):
+    def reduce(self, all_data):
 
         selected = [data for sim, data in all_data.items()]
         if len(selected) == 0:
@@ -503,8 +508,7 @@ class annualSevereTreatedByAgeAnalyzer(BaseAnalyzer):
                    index=False)
 
 
-
-class monthlySevereTreatedByAgeAnalyzer(BaseAnalyzer):
+class monthlySevereTreatedByAgeAnalyzer(IAnalyzer):
     @classmethod
     def monthparser(self, x):
         if x == 0:
@@ -526,7 +530,7 @@ class monthlySevereTreatedByAgeAnalyzer(BaseAnalyzer):
         self.end_year = end_year
         self.ds_col = ds_col
 
-    def select_simulation_data(self, data, simulation):
+    def map(self, data, simulation):
 
         output_data = data[self.filenames[0]].copy()
         output_data = output_data[output_data['Event_Name'] == self.event_name]
@@ -557,7 +561,7 @@ class monthlySevereTreatedByAgeAnalyzer(BaseAnalyzer):
             simdata = pd.DataFrame(columns=['year', 'month', self.event_name] + self.sweep_variables)
         return simdata
 
-    def finalize(self, all_data):
+    def reduce(self, all_data):
 
         selected = [data for sim, data in all_data.items()]
         if len(selected) == 0:
@@ -572,4 +576,3 @@ class monthlySevereTreatedByAgeAnalyzer(BaseAnalyzer):
         print(f"\nSaving output to {os.path.join(self.working_dir, 'Treated_Severe_Monthly_Cases_By_Age.csv')}")
         adf.to_csv(os.path.join(self.working_dir, 'Treated_Severe_Monthly_Cases_By_Age.csv'),
                    index=False)
-

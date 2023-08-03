@@ -228,20 +228,42 @@ def add_input_files(task, iopath, my_ds, archetype_ds=None, demographic_suffix='
             file_path = os.path.join(ds, f'{ds}_air_temperature_daily{climate_suffix}.bin')
             task.common_assets.add_asset(os.path.join(iopath, 'simulation_inputs', file_path),
                                          relative_path=str(Path(file_path).parent), fail_on_duplicate=False)
+            file_path = os.path.join(ds, f'{ds}_air_temperature_daily{climate_suffix}.bin.json')
+            task.common_assets.add_asset(os.path.join(iopath, 'simulation_inputs', file_path),
+                                         relative_path=str(Path(file_path).parent), fail_on_duplicate=False)
+
             file_path = os.path.join(ds, f'{ds}_rainfall_daily{climate_suffix}.bin')
             task.common_assets.add_asset(os.path.join(iopath, 'simulation_inputs', file_path),
                                          relative_path=str(Path(file_path).parent), fail_on_duplicate=False)
+            file_path = os.path.join(ds, f'{ds}_rainfall_daily{climate_suffix}.bin.json')
+            task.common_assets.add_asset(os.path.join(iopath, 'simulation_inputs', file_path),
+                                         relative_path=str(Path(file_path).parent), fail_on_duplicate=False)
+
             file_path = os.path.join(ds, f'{ds}_relative_humidity_daily{climate_suffix}.bin')
+            task.common_assets.add_asset(os.path.join(iopath, 'simulation_inputs', file_path),
+                                         relative_path=str(Path(file_path).parent), fail_on_duplicate=False)
+            file_path = os.path.join(ds, f'{ds}_relative_humidity_daily{climate_suffix}.bin.json')
             task.common_assets.add_asset(os.path.join(iopath, 'simulation_inputs', file_path),
                                          relative_path=str(Path(file_path).parent), fail_on_duplicate=False)
         else:
             file_path = os.path.join(ds, f'air_temperature_daily{climate_suffix}.bin')
             task.common_assets.add_asset(os.path.join(iopath, 'simulation_inputs', file_path),
                                          relative_path=str(Path(file_path).parent), fail_on_duplicate=False)
+            file_path = os.path.join(ds, f'air_temperature_daily{climate_suffix}.bin.json')
+            task.common_assets.add_asset(os.path.join(iopath, 'simulation_inputs', file_path),
+                                         relative_path=str(Path(file_path).parent), fail_on_duplicate=False)
+
             file_path = os.path.join(ds, f'rainfall_daily{climate_suffix}.bin')
             task.common_assets.add_asset(os.path.join(iopath, 'simulation_inputs', file_path),
                                          relative_path=str(Path(file_path).parent), fail_on_duplicate=False)
+            file_path = os.path.join(ds, f'rainfall_daily{climate_suffix}.bin.json')
+            task.common_assets.add_asset(os.path.join(iopath, 'simulation_inputs', file_path),
+                                         relative_path=str(Path(file_path).parent), fail_on_duplicate=False)
+
             file_path = os.path.join(ds, f'relative_humidity_daily{climate_suffix}.bin')
+            task.common_assets.add_asset(os.path.join(iopath, 'simulation_inputs', file_path),
+                                         relative_path=str(Path(file_path).parent), fail_on_duplicate=False)
+            file_path = os.path.join(ds, f'relative_humidity_daily{climate_suffix}.bin.json')
             task.common_assets.add_asset(os.path.join(iopath, 'simulation_inputs', file_path),
                                          relative_path=str(Path(file_path).parent), fail_on_duplicate=False)
 

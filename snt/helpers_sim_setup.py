@@ -139,9 +139,10 @@ def set_habitats(config, manifest, hfca, hdf, lhdf, archetype_hfca, hab_multipli
                                                         }
                                                         )
         set_species_param(config, sp, "Habitats", linear_spline_habitat, overwrite=True)
-        constant_habitat = {"Habitat_Type": "CONSTANT",
-                            "Max_Larval_Capacity": pow(10, const) * s * const_mult}
-        set_species_param(config, sp, "Habitats", constant_habitat, overwrite=False)
+        habitat = dfs.schema_to_config_subnode(manifest.schema_file, ["idmTypes", "idmType:VectorHabitat"])
+        habitat.parameters.Habitat_Type = "CONSTANT"
+        habitat.parameters.Max_Larval_Capacity = pow(10, const) * s * const_mult
+        set_species_param(config, sp, "Habitats", habitat.parameters, overwrite=False)
 
 
 def load_spline_and_scale_factors(lhdf, archetype_hfca):

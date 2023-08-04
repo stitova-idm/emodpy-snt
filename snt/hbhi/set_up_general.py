@@ -446,9 +446,10 @@ def set_habitats(config, manifest, hdf, lhdf, archetype_ds, hab_multiplier, my_d
                                                                                      334],
                                                                            "Values": my_spline})
         malaria_config.set_species_param(config, sp, "Habitats", linear_spline_habitat, overwrite=True)
-        constant_habitat = {"Habitat_Type": "CONSTANT",
-                            "Max_Larval_Capacity": pow(10, const) * s * const_mult}
-        malaria_config.set_species_param(config, sp, "Habitats", constant_habitat)
+        habitat = dfs.schema_to_config_subnode(manifest.schema_file, ["idmTypes", "idmType:VectorHabitat"])
+        habitat.parameters.Habitat_Type = "CONSTANT"
+        habitat.parameters.Max_Larval_Capacity = pow(10, const) * s * const_mult
+        malaria_config.set_species_param(config, sp, "Habitats", habitat.parameters)
 
 
 def load_spline_and_scale_factors(lhdf, archetype_ds):

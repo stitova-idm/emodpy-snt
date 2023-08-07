@@ -3,8 +3,6 @@ import pandas as pd
 import numpy as np
 import manifest
 
-test_run = False
-
 rep_admin = 'AA'
 simulation_pop = 10000  # from demographics file
 vector_human_scalar = simulation_pop / 1000

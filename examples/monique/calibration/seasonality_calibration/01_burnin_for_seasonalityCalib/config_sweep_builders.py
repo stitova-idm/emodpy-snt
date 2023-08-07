@@ -22,11 +22,6 @@ def get_sweep_builders(**kwargs):
     platform = kwargs.get('platform', None)
     builder = SimulationBuilder()
 
-    # Test
-    if params.test_run:
-        builder.add_sweep_definition(partial(set_param, param='Run_Number'), range(params.num_seeds))
-        return [builder]
-
     funcs_list = [[partial(set_param, param='Run_Number', value=x),
                    partial(set_param, param='MaxHab', value=params.max_habitat_value),
                    partial(set_param, param='ConstHab', value=params.const_habitat),

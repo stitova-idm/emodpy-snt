@@ -11,7 +11,6 @@ def _print_params():
     """
     Just a useful convenient function for the user.
     """
-    print("test_run: ", params.test_run)
     print("expname: ", params.expname)
     print("simulation_pop: ", params.simulation_pop)
     print("serialize: ", params.serialize)

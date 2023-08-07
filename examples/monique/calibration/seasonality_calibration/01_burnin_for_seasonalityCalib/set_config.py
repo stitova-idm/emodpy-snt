@@ -1,11 +1,11 @@
 import copy
 import emod_api.config.default_from_schema_no_validation as dfs
 from emodpy_malaria.malaria_config import configure_linear_spline, set_species_param
+from snt.calibration.helpers_seasonality_calibration import get_burnin_spline_values
+from snt.helpers_sim_setup import update_basic_params, set_input_files, set_drug_params
 
 import manifest
 import params
-from snt.calibration.helpers_seasonality_calibration import get_burnin_spline_values
-from snt.helpers_sim_setup import update_basic_params, set_input_files
 
 
 def set_config(config):
@@ -13,6 +13,8 @@ def set_config(config):
 
     set_input_files(config, params.rep_admin, params.rep_admin,
                     population_size=params.simulation_pop)  # climate and demographics files
+
+    set_drug_params(config)
 
     if params.serialize:
         config.parameters.Simulation_Duration = params.years * 365 + 1

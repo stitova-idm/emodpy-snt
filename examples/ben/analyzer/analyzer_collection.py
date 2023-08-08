@@ -150,7 +150,7 @@ class MonthlyTreatedCasesAnalyzer(IAnalyzer):
                                                                      "output/ReportMalariaFiltered.json"]
                                                           )
         self.sweep_variables = sweep_variables or ["LGA", "Run_Number"]
-        self.channels = channels or ['Received_Treatment', 'Received_Severe_Treatment', 'Received_NMF_Treatment']
+        self.channels = channels or ['ReceivedTreatment', 'Received_Severe_Treatment', 'Received_NMF_Treatment']
         self.inset_channels = ['Statistical Population', 'New Clinical Cases', 'New Severe Cases', 'PfHRP2 Prevalence']
         self.expt_name = expt_name
         self.start_year = start_year
@@ -168,7 +168,7 @@ class MonthlyTreatedCasesAnalyzer(IAnalyzer):
         simdata['Year'] = simdata['Time'].apply(lambda x: int(x / 365) + self.start_year)
         simdata['date'] = simdata.apply(lambda x: datetime.date(int(x['Year']), int(x['Month']), 1), axis=1)
 
-        sum_channels = ['Received_Treatment', 'Received_Severe_Treatment', 'New Clinical Cases', 'New Severe Cases',
+        sum_channels = ['ReceivedTreatment', 'Received_Severe_Treatment', 'New Clinical Cases', 'New Severe Cases',
                         'Received_NMF_Treatment']
         for x in [y for y in sum_channels if y not in simdata.columns.values]:
             simdata[x] = 0

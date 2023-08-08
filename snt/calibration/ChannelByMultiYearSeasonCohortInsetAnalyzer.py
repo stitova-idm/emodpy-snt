@@ -29,7 +29,7 @@ class ChannelByMultiYearSeasonCohortInsetAnalyzer(BaseCalibrationAnalyzer):
                                     'output/ReportMalariaFiltered.json'])
 
         self.population_channel = 'Statistical Population'
-        self.case_channel = 'Received_Treatment'
+        self.case_channel = 'ReceivedTreatment'
         self.prev_channel = 'PfHRP2 Prevalence'
         self.nmf_channel = 'Received_NMF_Treatment'
         self.comparison_channel = 'Treated Cases NMF Adjusted'

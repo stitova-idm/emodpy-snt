@@ -390,7 +390,7 @@ def setup_ds(config, manifest, platform, my_ds, archetype_ds=None,
         sdf = ser_df.copy()
         for t, v in zip(serialize_match_tag, serialize_match_val):
             if type(v) == float:
-                sdf[t] = sdf[t].apply(lambda x: np.round(x, 5))
+                sdf[t] = sdf[t].apply(lambda x: np.round(float(x), 5))
                 sdf = sdf[sdf[t] == np.round(v, 5)]
             else:
                 sdf = sdf[sdf[t] == v]

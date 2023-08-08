@@ -15,7 +15,7 @@ def set_config(config):
     config.parameters.Report_Event_Recorder = 1
     config.parameters.Report_Event_Recorder_Individual_Properties = []
     config.parameters.Report_Event_Recorder_Events = ['Received_NMF_Treatment', 'Received_Severe_Treatment',
-                                                      'Received_Treatment']
+                                                      'ReceivedTreatment']
     config.parameters.Report_Event_Recorder_Ignore_Events_In_List = 0
 
     set_species_param(config, 'arabiensis', 'Anthropophily', 0.88, overwrite=True)

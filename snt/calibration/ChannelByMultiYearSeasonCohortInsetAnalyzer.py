@@ -1,14 +1,11 @@
-import calendar
+import os
 import datetime
 import logging
 import pandas as pd
 import numpy as np
-import os
 import matplotlib.pyplot as plt
-
-from calibtool import LL_calculators
-from simtools.Analysis.BaseAnalyzers import BaseCalibrationAnalyzer
-
+from idmtools_calibra.utilities import ll_calculators
+from idmtools_calibra.analyzers.base_calibration_analyzer import BaseCalibrationAnalyzer
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +22,7 @@ class ChannelByMultiYearSeasonCohortInsetAnalyzer(BaseCalibrationAnalyzer):
         else:
             return datetime.datetime.strptime(str(x), '%j').month
 
-    def __init__(self, site, weight=1, compare_fn=LL_calculators.gamma_poisson_pandas, **kwargs):
+    def __init__(self, site, weight=1, compare_fn=ll_calculators.gamma_poisson_pandas, **kwargs):
         super().__init__(reference_data=site.get_reference_data('entomology_by_season'),
                          weight=weight,
                          filenames=['output/ReportEventCounter.json',
@@ -39,7 +36,7 @@ class ChannelByMultiYearSeasonCohortInsetAnalyzer(BaseCalibrationAnalyzer):
         self.compare_fn = compare_fn
         self.site_name = site.name
 
-    def select_simulation_data(self, data, simulation):
+    def map(self, data, simulation):
         """
         Extract data from output data and accumulate in same bins as reference.
         """
@@ -55,11 +52,10 @@ class ChannelByMultiYearSeasonCohortInsetAnalyzer(BaseCalibrationAnalyzer):
         # inflate pop for undercounted denom
         # simdata[self.population_channel] = simdata[self.population_channel]  # *1.2
 
-
         simdata = simdata[-365:].reset_index(drop=True)
         simdata['Time'] = simdata.index
         simdata['Day'] = simdata['Time'] % 365
-        simdata['Month'] = simdata['Day'].apply(lambda x: self.monthparser((x+1) % 365))
+        simdata['Month'] = simdata['Day'].apply(lambda x: self.monthparser((x + 1) % 365))
 
         simdata = simdata.rename(columns={self.population_channel: 'Trials',
                                           self.comparison_channel: 'Observations'})
@@ -85,7 +81,7 @@ class ChannelByMultiYearSeasonCohortInsetAnalyzer(BaseCalibrationAnalyzer):
         """
         return self.compare_fn(self.join_reference(sample, self.reference_data))
 
-    def finalize(self, all_data):
+    def reduce(self, all_data):
         """
         Calculate the output result for each sample.
         """
@@ -105,9 +101,9 @@ class ChannelByMultiYearSeasonCohortInsetAnalyzer(BaseCalibrationAnalyzer):
         sample_index = [s.tags.get('__sample_index__') for s in all_data.keys()]
 
         ref = self.reference_data
-        ref['incidence'] = ref['Observations']/ref['Trials']*1000
+        ref['incidence'] = ref['Observations'] / ref['Trials'] * 1000
 
-        for sample in list(set(sample_index)) :
+        for sample in list(set(sample_index)):
             selected_index = [i for i, s in enumerate(all_data.keys()) if s.tags.get('__sample_index__') == sample]
 
             fig = plt.figure()
@@ -115,13 +111,13 @@ class ChannelByMultiYearSeasonCohortInsetAnalyzer(BaseCalibrationAnalyzer):
 
             for n in selected_index:
                 plot_df = selected[n].reset_index()
-                plot_df['incidence'] = plot_df['Observations'] / plot_df['Trials']*1000
+                plot_df['incidence'] = plot_df['Observations'] / plot_df['Trials'] * 1000
                 ax.plot(plot_df['Month'], plot_df['incidence'], '-', color='r', linewidth=0.5, alpha=0.3)
 
             adf = pd.concat([selected[i].reset_index() for i in selected_index])
             plot_df = adf.groupby('Month').agg(np.mean).reset_index()
-            plot_df['incidence'] = plot_df['Observations'] / plot_df['Trials']*1000
-            ax.plot(plot_df['Month'], plot_df['incidence'],  '-o', color='r',
+            plot_df['incidence'] = plot_df['Observations'] / plot_df['Trials'] * 1000
+            ax.plot(plot_df['Month'], plot_df['incidence'], '-o', color='r',
                     label='iter %d sample %d' % (iteration, sample))
             ax.plot(ref['Month'], ref['incidence'],
                     '-o', color='#7AC4CD', label='reference')

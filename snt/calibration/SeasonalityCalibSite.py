@@ -1,26 +1,22 @@
 import logging
-import calendar
 from abc import ABCMeta
-
-from calibtool.CalibSite import CalibSite
-
-from simulation.calibration.ChannelByMultiYearSeasonCohortInsetAnalyzer import ChannelByMultiYearSeasonCohortInsetAnalyzer
-from simulation.calibration.helpers_seasonality_calibration import get_cases
+from idmtools_calibra.calib_site import CalibSite
+from snt.calibration.helpers_seasonality_calibration import get_cases
+from snt.calibration.ChannelByMultiYearSeasonCohortInsetAnalyzer import ChannelByMultiYearSeasonCohortInsetAnalyzer
 
 logger = logging.getLogger(__name__)
 
 
 class SeasonalityCalibSite(CalibSite):
-
     __metaclass__ = ABCMeta
 
     def __init__(self, hfca=None, project_path=None, **kwargs):
         self.metadata = {
-        'HFCA': hfca
-         }
+            'HFCA': hfca
+        }
         if 'throwaway' in kwargs:
             self.throwaway = kwargs['throwaway']
-        else :
+        else:
             self.throwaway = 0
         self.name = hfca
         self.project_path = project_path
@@ -39,4 +35,3 @@ class SeasonalityCalibSite(CalibSite):
 
         return [
             ChannelByMultiYearSeasonCohortInsetAnalyzer(site=self, throwaway=self.throwaway)]
-

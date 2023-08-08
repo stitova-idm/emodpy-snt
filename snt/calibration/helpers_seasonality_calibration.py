@@ -1,19 +1,11 @@
-import pandas as pd
 import os
-import sys
-from simtools.Utilities.Experiments import retrieve_experiment
-from simtools.SetupParser import SetupParser
-sys.path.append('../')
-
-from simulation.load_paths import load_box_paths
-from simulation.helpers_sim_setup import load_master_csv, load_spline_and_scale_factors, habitat_scales
-
+import pandas as pd
+from snt.helpers_sim_setup import habitat_scales
 
 
 # fit values for all months
 def get_burnin_spline_values(hfca, month_scalar, project_path):
-
-    month_vals = [month_scalar]*12
+    month_vals = [month_scalar] * 12
 
     hdf = habitat_scales(project_path)
     a = hdf.at[hfca, 'arabiensis_scale_factor']
@@ -29,13 +21,12 @@ def get_burnin_spline_values(hfca, month_scalar, project_path):
 
 
 def get_spline_values(hfca, project_path):
-
     hdf = habitat_scales(project_path)
 
-    df = pd.DataFrame( { 'Name': ['Month%d' % x for x in range(1,13)],
-                         'Guess': [0.005]*12,
-                         'Min': [0.00001]*12,
-                         'Max': [0.01]*12})
+    df = pd.DataFrame({'Name': ['Month%d' % x for x in range(1, 13)],
+                       'Guess': [0.005] * 12,
+                       'Min': [0.00001] * 12,
+                       'Max': [0.01] * 12})
     df = pd.concat([df, pd.DataFrame({'Name': ['MaxHab'], 'Guess': [11], 'Min': [9], 'Max': [12.5]}),
                     pd.DataFrame({'Name': ['Constant'], 'Guess': [6], 'Min': [6], 'Max': [10]})])
 
@@ -70,15 +61,15 @@ def get_spline_values(hfca, project_path):
 
 # select num_points months to fit (one of them is always January): will be num_points*2-1 values (num_points - 1) months selected plus num_points values for each month
 def get_spline_values2(hfca, project_path, num_points=4):
-
     hdf = habitat_scales(project_path)
 
-    df = pd.DataFrame( { 'Name': ['MonthNum%d' % x for x in range(1, (num_points+1))] + ['MonthVal%d' % x for x in range(1, (num_points+1))],
-                         'Guess': [0]*(num_points*2),
-                         'Min': [0]*(num_points*2),
-                         'Max': [0]*(num_points*2)})
+    df = pd.DataFrame({'Name': ['MonthNum%d' % x for x in range(1, (num_points + 1))] + ['MonthVal%d' % x for x in
+                                                                                         range(1, (num_points + 1))],
+                       'Guess': [0] * (num_points * 2),
+                       'Min': [0] * (num_points * 2),
+                       'Max': [0] * (num_points * 2)})
 
-    for month_num in range(1,(num_points+1)) :
+    for month_num in range(1, (num_points + 1)):
         num_name = 'MonthNum%d' % month_num
         val_name = 'MonthVal%d' % month_num
         df.loc[df['Name'] == num_name, 'Guess'] = month_num
@@ -108,16 +99,14 @@ def get_spline_values2(hfca, project_path, num_points=4):
     return df, fraction
 
 
-
 # fit values for odd months, cubic spline to get values for even months
 def get_spline_values3(hfca, project_path):
-
     hdf = habitat_scales(project_path)
 
-    df = pd.DataFrame( { 'Name': ['MonthVal%d' % (x*2+1) for x in range(6)],
-                         'Guess': [0.0075]*6,
-                         'Min': [0.00001]*6,
-                         'Max': [0.01]*6})
+    df = pd.DataFrame({'Name': ['MonthVal%d' % (x * 2 + 1) for x in range(6)],
+                       'Guess': [0.0075] * 6,
+                       'Min': [0.00001] * 6,
+                       'Max': [0.01] * 6})
 
     df = pd.concat([df, pd.DataFrame({'Name': ['MaxHab'], 'Guess': [11], 'Min': [9], 'Max': [12.5]})])
     df['Dynamic'] = True
@@ -136,13 +125,12 @@ def get_spline_values3(hfca, project_path):
 
 # fit values for all months
 def get_spline_values4(hfca, project_path):
-
     hdf = habitat_scales(project_path)
 
-    df = pd.DataFrame( { 'Name': ['MonthVal%d' % x for x in range(1,13)],
-                         'Guess': [0.0075]*12,
-                         'Min': [0.00001]*12,
-                         'Max': [0.1]*12})  # !0.01
+    df = pd.DataFrame({'Name': ['MonthVal%d' % x for x in range(1, 13)],
+                       'Guess': [0.0075] * 12,
+                       'Min': [0.00001] * 12,
+                       'Max': [0.1] * 12})  # !0.01
 
     df = pd.concat([df, pd.DataFrame({'Name': ['MaxHab'], 'Guess': [10], 'Min': [8], 'Max': [12.5]})])
     df['Dynamic'] = True
@@ -159,19 +147,18 @@ def get_spline_values4(hfca, project_path):
     return df, fraction
 
 
-
 # fit values for all months
 def get_spline_values4_constantMaxHab(hfca, project_path):
-
     hdf = habitat_scales(project_path)
 
-    df = pd.DataFrame( { 'Name': ['MonthVal%d' % x for x in range(1,13)],
-                         'Guess': [0.0075]*12,
-                         'Min': [0.00001]*12,
-                         'Max': [1]*12})  # !0.01
+    df = pd.DataFrame({'Name': ['MonthVal%d' % x for x in range(1, 13)],
+                       'Guess': [0.0075] * 12,
+                       'Min': [0.00001] * 12,
+                       'Max': [1] * 12})  # !0.01
     df['Dynamic'] = True
 
-    df = pd.concat([df, pd.DataFrame({'Name': ['MaxHab'], 'Guess': [10], 'Min': [10], 'Max': [10], 'Dynamic': [False]})])
+    df = pd.concat(
+        [df, pd.DataFrame({'Name': ['MaxHab'], 'Guess': [10], 'Min': [10], 'Max': [10], 'Dynamic': [False]})])
 
     a = hdf.at[hfca, 'arabiensis_scale_factor']
     f = hdf.at[hfca, 'funestus_scale_factor']
@@ -185,17 +172,14 @@ def get_spline_values4_constantMaxHab(hfca, project_path):
     return df, fraction
 
 
-
-
 # fit values for all months
 def get_spline_values5(hfca, project_path):
-
     hdf = habitat_scales(project_path)
 
-    df = pd.DataFrame( { 'Name': ['MonthVal%d' % x for x in range(1,13)],
-                         'Guess': [0.0075]*12,
-                         'Min': [0.00001]*12,
-                         'Max': [0.02]*12})  #!0.01
+    df = pd.DataFrame({'Name': ['MonthVal%d' % x for x in range(1, 13)],
+                       'Guess': [0.0075] * 12,
+                       'Min': [0.00001] * 12,
+                       'Max': [0.02] * 12})  # !0.01
 
     df = pd.concat([df, pd.DataFrame({'Name': ['MaxHab'], 'Guess': [11], 'Min': [9], 'Max': [12.5]})])
     df['Dynamic'] = True
@@ -204,7 +188,8 @@ def get_spline_values5(hfca, project_path):
     rain_fname = os.path.join(project_path, 'SpatialClustering', 'input_layers', 'rain', 'mean_rain_values_by_DS.csv')
     rain_df = pd.read_csv(rain_fname)
     rain_df = rain_df[rain_df['DS'] == hfca].reset_index()
-    max_rain = max([rain_df.iloc[0,col] for col in range(len(rain_df.columns)) if 'rainfall_month' in rain_df.columns[col]])
+    max_rain = max(
+        [rain_df.iloc[0, col] for col in range(len(rain_df.columns)) if 'rainfall_month' in rain_df.columns[col]])
     for month_num in range(1, 13):
         val_name = 'MonthVal%d' % month_num
         if month_num < 10:
@@ -212,7 +197,7 @@ def get_spline_values5(hfca, project_path):
         else:
             col_name = 'rainfall_month_%d' % month_num
         rain_col = [col for col in rain_df.columns if col_name in col]
-        df.loc[df['Name'] == val_name, 'Guess'] = rain_df.loc[0, rain_col[0]]/max_rain * 0.01
+        df.loc[df['Name'] == val_name, 'Guess'] = rain_df.loc[0, rain_col[0]] / max_rain * 0.01
 
     a = hdf.at[hfca, 'arabiensis_scale_factor']
     f = hdf.at[hfca, 'funestus_scale_factor']
@@ -224,10 +209,6 @@ def get_spline_values5(hfca, project_path):
     fraction = (max(0, a), max(0, f), max(0, g))
 
     return df, fraction
-
-
-
-
 
 
 # use the parameter values with the highest likelihood from a previous iteration as the starting point
@@ -238,6 +219,7 @@ def update_starting_spline_values(spline, round1_best_df):
         spline.loc[spline['Name'] == val_name, 'Guess'] = round1_best_df.loc[0, val_name]
 
     return spline
+
 
 # use the parameter values with the highest likelihood from a previous iteration as the starting point
 def update_starting_spline_values_constantMaxHab(spline, round1_best_df):
@@ -252,9 +234,7 @@ def update_starting_spline_values_constantMaxHab(spline, round1_best_df):
     return spline
 
 
-
-def get_cases(hfca, project_path) :
-
+def get_cases(hfca, project_path):
     reference_fname = os.path.join(project_path, 'simulation_inputs', 'incidence', 'archetype_incidence.csv')
 
     ref_df = pd.read_csv(reference_fname)
@@ -264,5 +244,3 @@ def get_cases(hfca, project_path) :
     ref_df['Observations'] = ref_df['incidence'] * ref_df['Trials'] / 1000
 
     return ref_df[['Month', 'Trials', 'Observations']]
-
-

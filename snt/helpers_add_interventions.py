@@ -689,16 +689,16 @@ def change_rtss_ips(campaign):
 
 def add_epi_rtss(campaign, rtss_df):
     start_days = list(rtss_df['RTSS_day'].unique())
-    coverage_levels = list(rtss_df['coverage'].values)
-    rtss_types = list(rtss_df['vaccine'].values)
-    rtss_touchpoints = list(rtss_df['rtss_touchpoints'].values)
+    coverage_levels = list(rtss_df['coverage'])
+    rtss_types = list(rtss_df['vaccine'])
+    rtss_touchpoints = list(rtss_df['rtss_touchpoints'])
     rtss_event_names = [f'RTSS_{x + 1}_eligible' for x in range(len(rtss_touchpoints))]
 
-    delay_distribution_name = list(rtss_df['distribution_name'].values)[0]
-    std_dev_list = list(rtss_df['distribution_std'].values)
+    delay_distribution_name = list(rtss_df['distribution_name'])[0]
+    std_dev_list = list(rtss_df['distribution_std'])
 
-    initial_effect_list = list(rtss_df['initial_effect'].values)
-    decay_time_constant_list = list(rtss_df['decay_time_constant'].values)
+    initial_effect_list = list(rtss_df['initial_effect'])
+    decay_time_constant_list = list(rtss_df['decay_time_constant'])
 
     for tp_time_trigger, coverage, vtype, event_name, std, init_eff, decay_t in \
             zip(rtss_touchpoints, coverage_levels, rtss_types, rtss_event_names, std_dev_list,

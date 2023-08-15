@@ -179,6 +179,6 @@ if __name__ == "__main__":
     # os.chdir(os.path.dirname(__file__))
     # print("...done.")
 
-    print("...done.")
+    # Specify local folder for calibration results
     directory = r'C:\Projects\emodpy-snt\data\TEST_DEST_CALIBRA'
     run_calibration(directory=directory)

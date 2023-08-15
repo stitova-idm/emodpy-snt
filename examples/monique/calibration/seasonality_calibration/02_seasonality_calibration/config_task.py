@@ -164,9 +164,6 @@ def _config_task(**kwargs):
         plugin_report=None
     )
 
-    # print("Adding local assets (py scripts mainly)...")
-    # task.common_assets.add_directory(assets_directory=manifest.assets_input_dir)    # TODO:
-
     # Config demographics
     demog_path = os.path.join(manifest.input_dir, params.demographics_file)
     task.common_assets.add_asset(demog_path, relative_path=str(Path(params.demographics_file).parent))

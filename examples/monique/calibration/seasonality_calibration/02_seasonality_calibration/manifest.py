@@ -14,7 +14,7 @@ plugins_folder = os.path.join(download_dir, "plugins")
 # user test data directory
 USER_PATH = None
 # specify user data for testing
-USER_PATH = r'C:\Projects\emodpy-snt\data'
+# USER_PATH = r'C:\Projects\emodpy-snt\data'
 
 # load project path
 data_path, project_path = load_box_paths(user_path=USER_PATH, country_name='Example')

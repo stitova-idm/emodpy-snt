@@ -172,10 +172,7 @@ if __name__ == "__main__":
     platform = Platform('CALCULON', node_group='idm_48cores')
     # platform = Platform('IDMCLOUD', node_group='emod_abcd')
 
-    # job_directory = 'TEST_DEST_SEASONALITY'
-    # job_directory = r'C:\Projects\emodpy-snt\data\TEST_DEST_SEASONALITY'
-    # platform = Platform('FILE', job_directory=job_directory)
-
+    # If you don't have Eradication, un-comment out the following to download Eradication
     # import emod_malaria.bootstrap as dtk
     #
     # dtk.setup(pathlib.Path(manifest.eradication_path).parent)

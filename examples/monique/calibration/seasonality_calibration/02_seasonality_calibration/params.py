@@ -64,8 +64,8 @@ sim_runs_per_param_set = 2  # outside of testing, generally 5
 sim_runs_per_param_set_second = 5  # 10
 sim_runs_per_param_set_fourth = 10  # 30
 max_iterations = 2  # outside of testing, generally 10
-max_iterations_second = 2   # 20
-max_iterations_fourth = 3   # 20
+max_iterations_second = 20
+max_iterations_fourth = 20
 samples_per_iteration = 8  # outside of testing, generally 40  # must be at least 8
 
 #############################################################################################################

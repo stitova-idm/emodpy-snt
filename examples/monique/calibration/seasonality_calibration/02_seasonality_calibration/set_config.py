@@ -13,14 +13,13 @@ def set_config(config):
     set_drug_params(config)
 
     config.parameters.Simulation_Duration = (params.throwaway + 1) * 365
-    config.parameters.Serialized_Population_Writing_Type = 'NONE'           # TODO ZDU: may not need as it is default
 
     if params.pull_from_serialization:
         from idmtools.core.context import get_current_platform
         platform = get_current_platform()
 
         ser_df = platform.create_sim_directory_df(params.burnin_id)
-        ser_df['MaxHab'] = ser_df['MaxHab'].astype(float)                   # TODO ZDU: required, otherwise filter return empty
+        ser_df['MaxHab'] = ser_df['MaxHab'].astype(float)
         if 'Admin_Name' in ser_df.columns.values:
             ser_df = ser_df[ser_df['MaxHab'] == params.burnin_max_habitat_value]
             ser_df = ser_df.set_index('Admin_Name')
@@ -33,8 +32,6 @@ def set_config(config):
         config.parameters.Serialized_Population_Filenames = ['state-%05d.dtk' % (params.burnin_years * 365)]
         config.parameters.Enable_Random_Generator_From_Serialized_Population = 0
         config.parameters.Serialization_Mask_Node_Read = 16
-    else:
-        config.parameters.Serialized_Population_Reading_Type = 'NONE'       # TODO ZDU: may not need as it is default
 
     # move to here from set_input_files
     config.parameters.Demographics_Filenames = [params.demographics_file]

@@ -108,9 +108,6 @@ def set_up_hfca(config, manifest, hfca, archetype_hfca=None,
         # 0 corresponds to the previous version default: the same larval habitat parameters will be used
         # in the burnin and pickup (from the burnin config)
 
-    else:
-        config.parameters.Serialized_Population_Reading_Type = 'NONE'
-
     return {'admin_name': hfca}
 
 

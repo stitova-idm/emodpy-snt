@@ -117,8 +117,7 @@ class ChannelByMultiYearSeasonCohortInsetAnalyzer(BaseCalibrationAnalyzer):
             adf = pd.concat([selected[i].reset_index() for i in selected_index])
             plot_df = adf.groupby('Month').agg(np.mean).reset_index()
             plot_df['incidence'] = plot_df['Observations'] / plot_df['Trials'] * 1000
-            ax.plot(plot_df['Month'], plot_df['incidence'], '-o', color='r',
-                    label='iter %d sample %d' % (iteration, sample))
+            ax.plot(plot_df['Month'], plot_df['incidence'], '-o', color='r', label=f'iter {iteration} sample {sample}')
             ax.plot(ref['Month'], ref['incidence'],
                     '-o', color='#7AC4CD', label='reference')
             ax.set_xlabel('Month')
@@ -126,7 +125,7 @@ class ChannelByMultiYearSeasonCohortInsetAnalyzer(BaseCalibrationAnalyzer):
             # ax.set_ylim(-0.02, 8.02)
             # ax.legend()
 
-            fig.savefig(os.path.join(self.working_dir, '%s_sample_%d.png' % (self.site_name, sample_index[n])))
+            fig.savefig(os.path.join(self.working_dir, f'{self.site_name}_sample_{sample_index[n]}.png'))
             plt.close(fig)
 
         return compare_results

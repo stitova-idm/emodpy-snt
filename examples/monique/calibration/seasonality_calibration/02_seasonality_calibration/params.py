@@ -107,11 +107,3 @@ params = []
 for i, row in spline.iterrows():
     d = row.to_dict()
     params.append(d)
-
-# overall format of monthly habitat to be specified
-ls_hab_ref = {'Capacity_Distribution_Number_Of_Years': 1,
-              'Capacity_Distribution_Over_Time': {
-                  'Times': [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334],
-                  'Values': []
-              },
-              'Max_Larval_Capacity': 800000000}

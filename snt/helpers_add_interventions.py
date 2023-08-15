@@ -717,20 +717,20 @@ def add_epi_rtss(campaign, rtss_df):
             delay_distribution = {"Delay_Period_Distribution": "CONSTANT_DISTRIBUTION",
                                   "Delay_Period_Gaussian_Mean": tp_time_trigger}
 
+        # triggered_campaign_delay_event only has option for constant delay, but we need different
+        # distributions, so we're manually creating a delayed intervention that broadcasts an event
+        # and slipping it into the triggered intervention
+        broadcast_event = BroadcastEvent(campaign, event_name)
+        if delay_distribution:
+            broadcast_event = DelayedIntervention(campaign, Configs=[broadcast_event],
+                                                  Delay_Dict=delay_distribution)
+        add_triggered_campaign_delay_event(campaign, start_day=start_days[0],
+                                           trigger_condition_list=['Births'],
+                                           demographic_coverage=coverage,
+                                           individual_intervention=broadcast_event)
+
         # TODO: Make EPI support booster1 and booster2
         if not vtype == 'booster':
-            # triggered_campaign_delay_event only has option for constant delay, but we need different
-            # distributions, so we're manually creating a delayed intervention that broadcasts an event
-            # and slipping it into the triggered intervention
-            broadcast_event = BroadcastEvent(campaign, event_name)
-            if delay_distribution:
-                broadcast_event = DelayedIntervention(campaign, Configs=[broadcast_event],
-                                                      Delay_Dict=delay_distribution)
-            add_triggered_campaign_delay_event(campaign, start_day=start_days[0],
-                                               trigger_condition_list=['Births'],
-                                               demographic_coverage=coverage,
-                                               individual_intervention=broadcast_event)
-            # SVET - verify this is what's wanted. Original code had multiple start days
             add_triggered_vaccine(campaign,
                                   start_day=start_days[0],
                                   trigger_condition_list=[event_name],
@@ -740,20 +740,8 @@ def add_epi_rtss(campaign, rtss_df):
                                   vaccine_initial_effect=init_eff,
                                   vaccine_box_duration=0,
                                   vaccine_decay_time_constant=decay_t,
-                                  efficacy_is_multiplicative=False
-                                  )
+                                  efficacy_is_multiplicative=False)
         else:
-            # triggered_campaign_delay_event only has option for constant delay, but we need different
-            # distributions, so we're manually creating a delayed intervention that broadcasts an event
-            # and slipping it into the triggered intervention
-            broadcast_event = BroadcastEvent(campaign, event_name)
-            if delay_distribution:
-                broadcast_event = DelayedIntervention(campaign, Configs=[broadcast_event],
-                                                      Delay_Dict=delay_distribution)
-            add_triggered_campaign_delay_event(campaign, start_day=start_days[0],
-                                               trigger_condition_list=['Births'],
-                                               demographic_coverage=coverage,
-                                               individual_intervention=broadcast_event)
 
             add_triggered_vaccine(campaign,
                                   start_day=start_days[0],

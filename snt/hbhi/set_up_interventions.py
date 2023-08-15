@@ -9,7 +9,7 @@ from emodpy_malaria.interventions.treatment_seeking import add_treatment_seeking
 from emodpy_malaria.interventions.diag_survey import add_diagnostic_survey
 from emodpy_malaria.interventions.drug_campaign import add_drug_campaign
 from snt.support_files.malaria_vaccdrug_campaigns import add_vaccdrug_campaign
-from emodpy_malaria.interventions.vaccine import add_scheduled_vaccine, _simple_vaccine
+from emodpy_malaria.interventions.vaccine import add_scheduled_vaccine, add_triggered_vaccine
 from emod_api.interventions.common import BroadcastEvent, DelayedIntervention
 from emodpy_malaria.interventions.common import add_triggered_campaign_delay_event
 
@@ -549,29 +549,39 @@ class InterventionSuite:
 
             # TODO: Make EPI support booster1 and booster2
             broadcast_event = BroadcastEvent(campaign, event_name)
-            broadcast_event_vaccine = BroadcastEvent(campaign, 'Received_Vaccine')
-            vaccine = _simple_vaccine(campaign, intervention_name="RTSS",
-                                      vaccine_type="AcquisitionBlocking",
-                                      vaccine_initial_effect=init_eff,
-                                      vaccine_box_duration=0,
-                                      vaccine_decay_time_constant=decay_t,
-                                      efficacy_is_multiplicative=False)
-            delayed_event = DelayedIntervention(campaign, Configs=[broadcast_event, broadcast_event_vaccine,
-                                                                   vaccine],
+            delayed_event = DelayedIntervention(campaign, Configs=[broadcast_event],
                                                 Delay_Dict=delay_distribution)
+            add_triggered_campaign_delay_event(campaign, start_day=start_days[0],
+                                               trigger_condition_list=['Births'],
+                                               demographic_coverage=coverage,
+                                               individual_intervention=delayed_event)
 
             # TODO: Make EPI support booster1 and booster2
-            if not vtype == 'booster':
-                add_triggered_campaign_delay_event(campaign, start_day=start_days[0],
-                                                   trigger_condition_list=['Births'],
-                                                   demographic_coverage=coverage,
-                                                   individual_intervention=delayed_event)
-            else:
-                add_triggered_campaign_delay_event(campaign, start_day=start_days[0],
-                                                   trigger_condition_list=['Births'],
-                                                   demographic_coverage=coverage,
-                                                   individual_intervention=delayed_event,
-                                                   ind_property_restrictions=[{'VaccineStatus': 'GotVaccine'}])
+            for day in start_days:
+                if not vtype == 'booster':
+                    add_triggered_vaccine(campaign,
+                                          start_day=day,
+                                          trigger_condition_list=[event_name],
+                                          intervention_name='RTSS',
+                                          broadcast_event='Received_Vaccine',
+                                          vaccine_type="AcquisitionBlocking",
+                                          vaccine_initial_effect=init_eff,
+                                          vaccine_box_duration=0,
+                                          vaccine_decay_time_constant=decay_t,
+                                          efficacy_is_multiplicative=False)
+
+                else:
+                    add_triggered_vaccine(campaign,
+                                          start_day=day,
+                                          trigger_condition_list=[event_name],
+                                          intervention_name='RTSS',
+                                          ind_property_restrictions=[{'VaccineStatus': 'GotVaccine'}],
+                                          broadcast_event='Received_Vaccine',
+                                          vaccine_type="AcquisitionBlocking",
+                                          vaccine_initial_effect=init_eff,
+                                          vaccine_box_duration=0,
+                                          vaccine_decay_time_constant=decay_t,
+                                          efficacy_is_multiplicative=False)
 
     def add_campaign_rtss(self, campaign, rtss_df):
         for r, row in rtss_df.iterrows():

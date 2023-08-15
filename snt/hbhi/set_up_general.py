@@ -76,7 +76,17 @@ def initialize_config(config, manifest, years, serialize, yr_plusone=True,
     config.parameters.Enable_Vector_Species_Report = 0
     config.parameters.Report_Detection_Threshold_Blood_Smear_Parasites = 50
     config.parameters.Report_Parasite_Smear_Sensitivity = 0.02  # 50/uL
-    config.parameters.Report_Detection_Threshold_Blood_Smear_Parasites = 50
+    config.parameters.Report_Detection_Threshold_Blood_Smear_Gametocytes = 50
+    config.parameters.Report_Gametocyte_Smear_Sensitivity = 0.01 #default
+
+    # Resolving changes between malaria defaults and
+    config.parameters.Enable_Demographics_Birth = 1
+    config.parameters.Enable_Initial_Prevalence = 1
+    config.parameters.Enable_Natural_Mortality = 1
+    config.parameters.Enable_Vector_Migration = 0
+    config.parameters.Enable_Initial_Prevalence = 1
+    config.parameters.Start_Time = 0
+
     return config
 
 
@@ -380,7 +390,7 @@ def setup_ds(config, manifest, platform, my_ds, archetype_ds=None,
         sdf = ser_df.copy()
         for t, v in zip(serialize_match_tag, serialize_match_val):
             if type(v) == float:
-                sdf[t] = sdf[t].apply(lambda x: np.round(x, 5))
+                sdf[t] = sdf[t].apply(lambda x: np.round(float(x), 5))
                 sdf = sdf[sdf[t] == np.round(v, 5)]
             else:
                 sdf = sdf[sdf[t] == v]
@@ -436,10 +446,10 @@ def set_habitats(config, manifest, hdf, lhdf, archetype_ds, hab_multiplier, my_d
                                                                                      334],
                                                                            "Values": my_spline})
         malaria_config.set_species_param(config, sp, "Habitats", linear_spline_habitat, overwrite=True)
-        new_habitat = dfs.schema_to_config_subnode(manifest.schema_file, ["idmTypes", "idmType:VectorHabitat"])
-        new_habitat.parameters.Habitat_Type = "CONSTANT"
-        new_habitat.parameters.Max_Larval_Capacity = pow(10, const) * s * const_mult
-        malaria_config.set_species_param(config, sp, "Habitats", new_habitat.parameters)
+        habitat = dfs.schema_to_config_subnode(manifest.schema_file, ["idmTypes", "idmType:VectorHabitat"])
+        habitat.parameters.Habitat_Type = "CONSTANT"
+        habitat.parameters.Max_Larval_Capacity = pow(10, const) * s * const_mult
+        malaria_config.set_species_param(config, sp, "Habitats", habitat.parameters)
 
 
 def load_spline_and_scale_factors(lhdf, archetype_ds):
@@ -485,13 +495,14 @@ def load_rel_abund_df(projectpath):
 
 
 def set_spaq_params(config):
-    malaria_config.set_drug_param(config, 'Amodiaquine', "Drug_PKPD_C50", 1)
-    malaria_config.set_drug_param(config, 'Amodiaquine', "Max_Drug_IRBC_Kill", 0.23)
     malaria_config.set_drug_param(config, 'Sulfadoxine', "Drug_PKPD_C50", 0.2 * 6)
     malaria_config.set_drug_param(config, 'Sulfadoxine', "Max_Drug_IRBC_Kill", 0.506 * 0.675)
+
     malaria_config.set_drug_param(config, 'Pyrimethamine', "Drug_PKPD_C50", 8 * 6)
     malaria_config.set_drug_param(config, 'Pyrimethamine', "Max_Drug_IRBC_Kill", 0.6 * 0.6417)
 
+    malaria_config.set_drug_param(config, 'Amodiaquine', "Drug_PKPD_C50", 1)
+    malaria_config.set_drug_param(config, 'Amodiaquine', "Max_Drug_IRBC_Kill", 0.23)
     malaria_config.set_drug_param(config, 'Amodiaquine', "Drug_Cmax", 95)
     malaria_config.set_drug_param(config, 'Amodiaquine', "Drug_Decay_T1", 0.775)
     malaria_config.set_drug_param(config, 'Amodiaquine', "Drug_Decay_T2", 37.5)

@@ -36,7 +36,7 @@ def set_config(config):
     habitat = dfs.schema_to_config_subnode(manifest.schema_file, ["idmTypes", "idmType:VectorHabitat"])
     for (s, sp) in zip(fractions, ['arabiensis', 'funestus', 'gambiae']):
         linear_spline_habitat = configure_linear_spline(manifest,
-                                                        max_larval_capacity=pow(10, params.max_habitat_value),
+                                                        max_larval_capacity=pow(10, params.max_habitat_value) * s,
                                                         capacity_distribution_number_of_years=1,
                                                         capacity_distribution_over_time={
                                                             "Times": [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304,

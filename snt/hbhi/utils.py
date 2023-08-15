@@ -9,7 +9,7 @@ def add_nmf_trt(campaign, num_years, start_year,
                 coverage=0.0038, diagnostic_threshold=5):
     for nmf_years in range(num_years):
         add_drug_campaign(campaign, 'MSAT', 'AL',
-                          start_days=[1 + 365 * nmf_years + start_year * 365],
+                          start_days=[365 * nmf_years + start_year * 365],
                           coverage=coverage,
                           repetitions=365, tsteps_btwn_repetitions=1,
                           diagnostic_type='PF_HRP2', diagnostic_threshold=diagnostic_threshold,

@@ -1,13 +1,15 @@
 import manifest
 import params
-from snt.helpers_sim_setup import update_basic_params
+from snt.helpers_sim_setup import update_basic_params, set_drug_params
 
 
 def set_config(config):
     update_basic_params(config, manifest, manifest.project_path)
 
+    set_drug_params(config)
+
     config.parameters.Report_Event_Recorder = 1
-    config.parameters.Report_Event_Recorder_Events = ['Received_Severe_Treatment']  # !, 'Bednet_Got_New_One'],
+    config.parameters.Report_Event_Recorder_Events = ['Received_Severe_Treatment']
     config.parameters.Report_Event_Recorder_Ignore_Events_In_List = 0
     config.parameters.Report_Event_Recorder_Individual_Properties = []
 
@@ -22,5 +24,11 @@ def set_config(config):
         config.parameters.Serialized_Population_Reading_Type = 'NONE'
         config.parameters.Simulation_Duration = params.years * 365 + 1
         config.parameters.Serialized_Population_Writing_Type = 'NONE'
+
+    # move to here from set_input_files
+    config.parameters.Demographics_Filenames = [params.demographics_file]
+
+    # add Custom Individual Events
+    config.parameters.Custom_Individual_Events.extend(["Bednet_Got_New_One", "Bednet_Using", "Bednet_Discarded"])
 
     return config

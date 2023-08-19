@@ -81,10 +81,12 @@ def set_up_hfca(config, manifest, hfca, archetype_hfca=None,
 
     if pull_from_serialization:
         hab_scale_factor_param_name = 'Habitat_Multiplier'
+        if 'Run_Number' in ser_df.columns.values:
+            ser_df['Run_Number'] = ser_df['Run_Number'].astype(int)
         if use_arch_burnin:
             if hab_multiplier >= 0 and run_number >= 0:
                 ser_df[hab_scale_factor_param_name] = ser_df[hab_scale_factor_param_name].apply(
-                    lambda x: np.round(x, 5))
+                    lambda x: np.round(float(x), 5))
                 sdf = ser_df[(ser_df[hab_scale_factor_param_name] >= (np.round(hab_multiplier, 5) - 0.00001)) &
                              (ser_df[hab_scale_factor_param_name] <= (np.round(hab_multiplier, 5) + 0.00001)) &
                              (ser_df['Run_Number'] == run_number) &

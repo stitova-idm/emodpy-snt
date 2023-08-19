@@ -45,7 +45,7 @@ def _config_experiment(**kwargs):
     task = get_task(**kwargs)
 
     if manifest.sif_path:
-        task.sif_path = manifest.sif_path
+        task.set_sif(manifest.sif_path)
 
     ts = TemplatedSimulations(base_task=task, builders=builders)
 

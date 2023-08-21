@@ -70,8 +70,8 @@ def run_experiment(**kwargs):
 
 
 if __name__ == "__main__":
-    # platform = Platform('CALCULON', node_group='idm_48cores')
-    platform = Platform('IDMCLOUD', node_group='emod_abcd')
+    platform = Platform('CALCULON', node_group='idm_48cores')
+    # platform = Platform('IDMCLOUD', node_group='emod_abcd')
 
     # If you don't have Eradication, un-comment out the following to download Eradication
     # import emod_malaria.bootstrap as dtk

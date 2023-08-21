@@ -9,8 +9,6 @@ download_dir = os.path.join(PROJECT_DIR, "download")
 schema_file = os.path.join(download_dir, "schema.json")
 eradication_path = os.path.join(download_dir, "Eradication")
 
-plugins_folder = os.path.join(download_dir, "plugins")
-
 # user test data directory
 USER_PATH = None
 # specify user data for testing

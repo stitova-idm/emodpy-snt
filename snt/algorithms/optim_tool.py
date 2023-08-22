@@ -189,6 +189,7 @@ class OptimTool(NextPointAlgorithm):
         self.state = pd.DataFrame(columns=['Iteration', 'Parameter', 'Center', 'Min', 'Max', 'Dynamic'])
         self.state['Iteration'] = self.state['Iteration'].astype(int)
 
+        user_logger.info("Choose initial samples")
         for param in self.params:
             user_logger.info((iteration, param['Name'], param['Guess'], param['Min'], param['Max'], param['Dynamic']))
             self.state.loc[len(self.state)] = [iteration, param['Name'], param['Guess'], param['Min'], param['Max'],

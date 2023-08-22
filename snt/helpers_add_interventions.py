@@ -361,6 +361,7 @@ def add_itn_anc(campaign, itn_anc_df, itn_anc_adult_birthday_years, itn_use_seas
                                                  killing_decay_time_constant=itn_decay_kill,
                                                  blocking_initial_effect=row['block_initial'],
                                                  blocking_decay_time_constant=itn_decay_block,
+                                                 discard_config=itn_discard_config,
                                                  age_dependence={'Times': [0, 120],
                                                                  'Values': [indoor_net_protection,
                                                                             indoor_net_protection]},

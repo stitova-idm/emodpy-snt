@@ -1,6 +1,7 @@
 import os
 import manifest
 import params
+import warnings
 import pandas as pd
 import numpy as np
 from typing import List
@@ -84,14 +85,16 @@ def get_sweep_builders(**kwargs):
             os.path.join(project_path, 'simulation_inputs', '%s.csv' % scen_df.at[scen_index, 'EPI_ITN_filename']))
     else:
         itn_epi_df = pd.DataFrame()
-    # TODO ZDU: no column 'CHW_ITN_annual_filename'
-    # if (not pd.isna(scen_df.at[scen_index, 'CHW_ITN_annual_filename'])) and (
-    #         not (scen_df.at[scen_index, 'CHW_ITN_annual_filename'] == '')):
-    #     itn_chw_annual_df = pd.read_csv(os.path.join(project_path, 'simulation_inputs',
-    #                                                  '%s.csv' % scen_df.at[scen_index, 'CHW_ITN_annual_filename']))
-    # else:
-    #     itn_chw_annual_df = pd.DataFrame()
-    itn_chw_annual_df = pd.DataFrame()  # TODO ZDU: test
+    # Handle no column 'CHW_ITN_annual_filename' case!
+    if 'CHW_ITN_annual_filename' in scen_df.columns.values:
+        if (not pd.isna(scen_df.at[scen_index, 'CHW_ITN_annual_filename'])) and (
+                not (scen_df.at[scen_index, 'CHW_ITN_annual_filename'] == '')):
+            itn_chw_annual_df = pd.read_csv(os.path.join(project_path, 'simulation_inputs',
+                                                         '%s.csv' % scen_df.at[scen_index, 'CHW_ITN_annual_filename']))
+        else:
+            itn_chw_annual_df = pd.DataFrame()
+    else:
+        itn_chw_annual_df = pd.DataFrame()
 
     itn_decay_params = pd.read_csv(os.path.join(project_path, 'simulation_inputs', 'itn_discard_decay_params.csv'))
     itn_use_seasonality = pd.read_csv(os.path.join(project_path, 'simulation_inputs', 'ITN_use_seasonality.csv'))
@@ -131,8 +134,7 @@ def get_sweep_builders(**kwargs):
             admin_subset = list(set(admin_subset_df['admin_name']))
             master_df = master_df[master_df.index.isin(admin_subset)]
         else:
-            print('Admin subset not found. Running simulations with all admins.')
-            # warnings.warn('Admin subset not found. Running simulations with all admins.')       # TODOZDU
+            warnings.warn('Admin subset not found. Running simulations with all admins.')
 
     # FOR CONFIGURING LARVAL HABTIATS
     hab_scale_factor_fname = os.path.join(project_path, 'simulation_inputs', 'larval_habitats',

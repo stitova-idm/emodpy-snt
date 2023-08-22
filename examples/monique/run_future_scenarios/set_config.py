@@ -16,19 +16,17 @@ def set_config(config):
     if params.serialize:
         config.parameters.Simulation_Duration = params.years * 365 + 1
         config.parameters.Serialization_Time_Steps = [365 * (params.years - 5), 365 * params.years]
-        config.parameters.Serialized_Population_Reading_Type = 'NONE'       # TODO: remove
         config.parameters.Serialized_Population_Writing_Type = 'TIMESTEP'
         config.parameters.Serialization_Mask_Node_Write = 0
         config.parameters.Serialization_Precision = 'REDUCED'
     else:
-        config.parameters.Serialized_Population_Reading_Type = 'NONE'       # TODO: remove
         config.parameters.Simulation_Duration = params.years * 365 + 1
-        config.parameters.Serialized_Population_Writing_Type = 'NONE'       # TODO: remove
 
     # move to here from set_input_files
     config.parameters.Demographics_Filenames = [params.demographics_file]
 
     # add Custom Individual Events
-    config.parameters.Custom_Individual_Events.extend(['ReceivedTreatment', 'Received_Severe_Treatment', 'Received_NMF_Treatment'])
+    config.parameters.Custom_Individual_Events.extend(
+        ['ReceivedTreatment', 'Received_Severe_Treatment', 'Received_NMF_Treatment'])
 
     return config

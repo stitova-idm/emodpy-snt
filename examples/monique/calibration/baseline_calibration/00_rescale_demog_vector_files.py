@@ -1,16 +1,16 @@
 # sometimes, the population size needs to change between calibration and later simulations (e.g., memory limitations)
 #   the goal of this script is to update the demographics file and the vector monthly larval habitat file
 #   to produce rescaled simulations with the desired human population size.
-
+import os
+import json
 import pandas as pd
 import numpy as np
-import json
-import os
-import sys
-sys.path.append('../../')
-from simulation.load_paths import load_box_paths
+from snt.load_paths import load_box_paths
 
-data_path, project_path = load_box_paths(country_name='Example')
+# Specify data location
+USER_PATH = None
+USER_PATH = r'C:\Projects\emodpy-snt\data'
+_, project_path = load_box_paths(user_path=USER_PATH, country_name='Example')
 
 
 def update_demog_and_vector_pop(demog_filepath, larval_habitat_filepath, new_pop_size):
@@ -22,7 +22,8 @@ def update_demog_and_vector_pop(demog_filepath, larval_habitat_filepath, new_pop
 
     # calculate and update demographics parameters to correspond with new population size
     demog_death_rate = demog_dict['Defaults']['IndividualAttributes']['MortalityDistribution']['ResultValues'][0][0]
-    demog_death_rate_scale = demog_dict['Defaults']['IndividualAttributes']['MortalityDistribution']['ResultScaleFactor']
+    demog_death_rate_scale = demog_dict['Defaults']['IndividualAttributes']['MortalityDistribution'][
+        'ResultScaleFactor']
     new_birth_number = new_pop_size * demog_death_rate_scale * demog_death_rate
     demog_dict_new = demog_dict
     demog_dict_new['Nodes'][0]['NodeAttributes']['InitialPopulation'] = new_pop_size
@@ -43,11 +44,14 @@ def update_demog_and_vector_pop(demog_filepath, larval_habitat_filepath, new_pop
     with open(new_demog_filepath, "w") as outfile:
         outfile.write(json_object)
 
+
 if __name__ == "__main__":
     # original demographics filepath
-    demog_filepath = os.path.join(project_path, 'simulation_inputs', 'demographics_and_climate', '_entire_country', 'demographics_each_admin_10000.json')
+    demog_filepath = os.path.join(project_path, 'simulation_inputs', 'demographics_and_climate', '_entire_country',
+                                  'demographics_each_admin_10000.json')
     # original vector larval habitat filepath that was created with the original demographics file
-    larval_habitat_filepath = os.path.join(project_path, 'simulation_inputs', 'larval_habitats', 'monthly_habitats_1.csv')
+    larval_habitat_filepath = os.path.join(project_path, 'simulation_inputs', 'larval_habitats',
+                                           'monthly_habitats_1.csv')
     # target demographic population size that will be used for later simulations
     new_pop_size = 6000
     # create new input files, rescaled for the new population size

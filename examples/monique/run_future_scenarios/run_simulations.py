@@ -52,7 +52,7 @@ def _config_experiment(**kwargs):
 
 def run_experiment(**kwargs):
     """
-    Get configured calibration and run
+    Get configured calibration and run.
     Args:
         kwargs: user inputs
 
@@ -63,10 +63,6 @@ def run_experiment(**kwargs):
     kwargs['platform'] = platform
 
     _print_params()
-
-    import sys
-    import os
-    sys.stdout = open(os.devnull, 'w')
 
     experiment = _config_experiment(**kwargs)
     experiment.run(wait_until_done=False, wait_on_done=False)

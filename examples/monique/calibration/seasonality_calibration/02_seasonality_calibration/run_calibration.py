@@ -79,7 +79,7 @@ def map_sample_to_model_input(simulation, sample):
         # set_species_param(simulation.task.config, sp, "Habitats", hab, overwrite=True)
 
         linear_spline_habitat = configure_linear_spline(manifest,
-                                                        max_larval_capacity=800000000,
+                                                        max_larval_capacity=pow(10, maxvalue)*s,
                                                         capacity_distribution_number_of_years=1,
                                                         capacity_distribution_over_time={
                                                             "Times": [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304,
@@ -91,7 +91,7 @@ def map_sample_to_model_input(simulation, sample):
 
         new_habitat = copy.deepcopy(habitat)
         new_habitat.parameters.Habitat_Type = "CONSTANT"
-        new_habitat.parameters.Max_Larval_Capacity = pow(10, maxvalue) * s
+        new_habitat.parameters.Max_Larval_Capacity = pow(10, const)*s
         set_species_param(simulation.task.config, sp, "Habitats", new_habitat.parameters)
 
     # tags.update({'Pop_Scale' : 1})

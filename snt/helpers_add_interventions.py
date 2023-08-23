@@ -40,13 +40,13 @@ def add_hs_from_file(campaign, row):
 
     add_treatment_seeking(campaign, start_day=start_day,
                           targets=[{'trigger': 'NewClinicalCase', 'coverage': hs_child, 'agemin': 0, 'agemax': 5,
-                                    'seek': 1, 'rate': 0.3},
+                                    'rate': 0.3},
                                    {'trigger': 'NewClinicalCase', 'coverage': hs_adult, 'agemin': 5, 'agemax': 100,
-                                    'seek': 1, 'rate': 0.3},
+                                    'rate': 0.3},
                                    ],
                           drug=['Artemether', 'Lumefantrine'], duration=row['duration'])
     add_treatment_seeking(campaign, start_day=start_day,
-                          targets=[{'trigger': 'NewSevereCase', 'coverage': severe_cases, 'seek': 1, 'rate': 0.5}],
+                          targets=[{'trigger': 'NewSevereCase', 'coverage': severe_cases, 'rate': 0.5}],
                           # change by adding column and reviewing literature
                           drug=['Artemether', 'Lumefantrine'], duration=row['duration'],
                           broadcast_event_name='Received_Severe_Treatment')

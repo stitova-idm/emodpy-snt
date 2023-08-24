@@ -5,7 +5,7 @@ from pathlib import Path
 import emodpy_malaria.malaria_config as malaria_config
 import emod_api.config.default_from_schema_no_validation as dfs
 from emodpy_malaria.interventions.outbreak import add_outbreak_individual
-from emodpy_malaria.reporters.builtin import add_spatial_report_malaria_filtered, add_event_recorder
+from emodpy_malaria.reporters.builtin import add_report_malaria_filtered, add_event_recorder
 
 
 def initialize_config(config, manifest, years, serialize, yr_plusone=True,
@@ -121,8 +121,8 @@ def initialize_reports(task, manifest, event_reporter: bool = False, filtered_re
         num_year = filtered_report
         start = yr_plusone + (years - num_year) * 365
         end = yr_plusone + years * 365
-        # SpatialReportMalariaFiltered
-        add_spatial_report_malaria_filtered(task, manifest, start_day=int(start), end_day=int(end))
+        # ReportMalariaFiltered
+        add_report_malaria_filtered(task, manifest, start_day=int(start), end_day=int(end))
 
 
 def load_master_csv(projectpath, file=None, country=None):

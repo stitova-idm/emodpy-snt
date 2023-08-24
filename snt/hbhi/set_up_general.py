@@ -112,7 +112,7 @@ def initialize_reports(task, manifest, event_reporter: bool = False, filtered_re
 
     if event_reporter:
         add_event_recorder(task, event_list=['Received_Severe_Treatment',
-                                             # 'ReceivedTreatment', 'NewClinicalCase',
+                                             # 'Received_Treatment', 'NewClinicalCase',
                                              # 'NewSevereCase', 'Received_Campaign_Drugs',
                                              # 'No_SMC_Fever'
                                              ])

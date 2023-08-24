@@ -21,7 +21,7 @@ class monthlyTreatedCasesAnalyzer(IAnalyzer):
                                                           )
         self.sweep_variables = sweep_variables or ["__sample_index__", "Run_Number"]
         if channels is None:
-            self.channels = ['ReceivedTreatment', 'Received_Severe_Treatment', 'Received_NMF_Treatment']
+            self.channels = ['Received_Treatment', 'Received_Severe_Treatment', 'Received_NMF_Treatment']
         else:
             self.channels = channels
         self.inset_channels = ['Statistical Population', 'New Clinical Cases', 'New Severe Cases', 'PfHRP2 Prevalence']
@@ -104,7 +104,7 @@ if __name__ == "__main__":
         print('running expt %s' % expname)
         cur_monthlyTreatedCasesAnalyzer = monthlyTreatedCasesAnalyzer(expt_name=expname,
                                                                       channels=['Received_NMF_Treatment',
-                                                                                'ReceivedTreatment'],
+                                                                                'Received_Treatment'],
                                                                       sweep_variables=["Run_Number",
                                                                                        "__sample_index__"],
                                                                       working_dir=working_dir,

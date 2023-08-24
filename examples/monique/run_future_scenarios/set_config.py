@@ -27,6 +27,6 @@ def set_config(config):
 
     # add Custom Individual Events
     config.parameters.Custom_Individual_Events.extend(
-        ['ReceivedTreatment', 'Received_Severe_Treatment', 'Received_NMF_Treatment'])
+        ['Received_Treatment', 'Received_Severe_Treatment', 'Received_NMF_Treatment'])
 
     return config

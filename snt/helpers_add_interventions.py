@@ -247,7 +247,7 @@ def add_itn_from_file(campaign, row, itn_use_seasonality, itn_decay_params):
         if row['simday'] == 895:
             add_triggered_usage_dependent_bednet(campaign, start_day=0,
                                                  demographic_coverage=row['ITN coverage uncomplicated treatment'],
-                                                 trigger_condition_list=['ReceivedTreatment'],
+                                                 trigger_condition_list=['Received_Treatment'],
                                                  listening_duration=-1,
                                                  killing_initial_effect=row['kill_initial'],
                                                  killing_decay_time_constant=itn_decay_kill,
@@ -922,7 +922,7 @@ def add_all_interventions(campaign, hfca, seed_index=1, hs_df=pd.DataFrame(), nm
         # case management for malaria
         has_cm = add_hfca_hs(campaign, hs_df, hfca, seed_index=seed_index)
         if has_cm:
-            event_list.append('ReceivedTreatment')
+            event_list.append('Received_Treatment')
             event_list.append('Received_Severe_Treatment')
         # case management for NMFs
         add_nmf_hs(campaign, hs_df, nmf_df, hfca, seed_index=seed_index)

@@ -198,7 +198,7 @@ class monthlyTreatedCasesAnalyzer(IAnalyzer):
                                                           )
         self.sweep_variables = sweep_variables or ["admin_name", "Run_Number"]
         if channels is None:
-            self.channels = ['ReceivedTreatment', 'Received_Severe_Treatment', 'Received_NMF_Treatment']
+            self.channels = ['Received_Treatment', 'Received_Severe_Treatment', 'Received_NMF_Treatment']
         else:
             self.channels = channels
         self.inset_channels = ['Statistical Population', 'New Clinical Cases', 'New Severe Cases', 'PfHRP2 Prevalence']
@@ -330,7 +330,7 @@ class monthlyEventAnalyzer(IAnalyzer):
                                                    )
         self.sweep_variables = sweep_variables or ["admin_name", "Run_Number"]
         if channels is None:
-            self.channels = ['ReceivedTreatment', 'Received_Severe_Treatment', 'Received_NMF_Treatment',
+            self.channels = ['Received_Treatment', 'Received_Severe_Treatment', 'Received_NMF_Treatment',
                              'Received_Self_Medication', 'Bednet_Using', 'Bednet_Got_New_One',
                              # currently removed 'Bednet_Got_New_One', since length is 1 longer than expected for unknown reasons
                              'Received_Campaign_Drugs', 'Received_IRS', 'Received_Vaccine', 'Received_PMC_VaccDrug']
@@ -945,7 +945,7 @@ if __name__ == "__main__":
     if (not include_LLINp) and (not itn_comparison):
         for expname, expid in expt_ids.items():
             print('running expt %s' % expname)
-            report_count_channels = ['ReceivedTreatment', 'Received_Severe_Treatment', 'Received_NMF_Treatment',
+            report_count_channels = ['Received_Treatment', 'Received_Severe_Treatment', 'Received_NMF_Treatment',
                                      'Received_Self_Medication', 'Bednet_Got_New_One', 'Bednet_Using',
                                      'Received_Campaign_Drugs', 'Received_IRS'
                                      ]
@@ -1081,7 +1081,7 @@ if __name__ == "__main__":
     elif itn_comparison:
         for expname, expid in expt_ids.items():
             print('running expt %s' % expname)
-            report_count_channels = ['ReceivedTreatment', 'Received_Severe_Treatment', 'Received_NMF_Treatment',
+            report_count_channels = ['Received_Treatment', 'Received_Severe_Treatment', 'Received_NMF_Treatment',
                                      'Received_Self_Medication', 'Bednet_Got_New_One', 'Bednet_Using',
                                      'Received_Campaign_Drugs', 'Received_IRS'
                                      ]

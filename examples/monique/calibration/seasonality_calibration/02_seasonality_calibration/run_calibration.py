@@ -8,6 +8,7 @@ import emod_api.config.default_from_schema_no_validation as dfs
 from emodpy_malaria.malaria_config import configure_linear_spline, set_species_param
 from snt.algorithms.optim_tool import OptimTool
 from snt.calibration.SeasonalityCalibSite import SeasonalityCalibSite
+from snt.utility.emod_api_utils import suppress_warnings
 
 import manifest
 import params
@@ -79,7 +80,7 @@ def map_sample_to_model_input(simulation, sample):
         # set_species_param(simulation.task.config, sp, "Habitats", hab, overwrite=True)
 
         linear_spline_habitat = configure_linear_spline(manifest,
-                                                        max_larval_capacity=pow(10, maxvalue)*s,
+                                                        max_larval_capacity=pow(10, maxvalue) * s,
                                                         capacity_distribution_number_of_years=1,
                                                         capacity_distribution_over_time={
                                                             "Times": [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304,
@@ -91,7 +92,7 @@ def map_sample_to_model_input(simulation, sample):
 
         new_habitat = copy.deepcopy(habitat)
         new_habitat.parameters.Habitat_Type = "CONSTANT"
-        new_habitat.parameters.Max_Larval_Capacity = pow(10, const)*s
+        new_habitat.parameters.Max_Larval_Capacity = pow(10, const) * s
         set_species_param(simulation.task.config, sp, "Habitats", new_habitat.parameters)
 
     # tags.update({'Pop_Scale' : 1})
@@ -153,15 +154,21 @@ def get_manager(**kwargs):
     return calib_manager
 
 
-def run_calibration(**kwargs):
+def run_calibration(directory: str = '.', show_warnings: bool = True, **kwargs):
     """
     Get configured calibration and run.
     Args:
+        directory: str, where to keep calibration results
+        show_warnings: True/False
         kwargs: user inputs
     Returns:
         None
     """
+    # make sure pass platform through
     kwargs['platform'] = platform
+    kwargs['directory'] = directory
+    suppress_warnings(show_warnings=show_warnings)
+
     print_params()
 
     calib_manager = get_manager(**kwargs)
@@ -180,5 +187,5 @@ if __name__ == "__main__":
     # print("...done.")
 
     # Specify local folder for calibration results
-    directory = r'C:\Projects\emodpy-snt\data\TEST_DEST_CALIBRA'
-    run_calibration(directory=directory)
+    directory = r'C:\Projects\emodpy-snt\data\TEST_DEST_CALIBRA4'
+    run_calibration(directory=directory, show_warnings=False)

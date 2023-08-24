@@ -3,8 +3,7 @@ import params
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.templated_simulation import TemplatedSimulations
-from config_sweep_builders import get_sweep_builders
-from config_task import get_task
+from snt.utility.emod_api_utils import suppress_warnings
 
 
 def _print_params():
@@ -39,6 +38,8 @@ def _config_experiment(**kwargs):
     Return:
         experiment
     """
+    from config_sweep_builders import get_sweep_builders
+    from config_task import get_task
 
     builders = get_sweep_builders(**kwargs)
 
@@ -54,17 +55,18 @@ def _config_experiment(**kwargs):
     return experiment
 
 
-def run_experiment(**kwargs):
+def run_experiment(show_warnings: bool = True, **kwargs):
     """
-    Get configured calibration and run
+    Get configured calibration and run.
     Args:
+        show_warnings: True/False
         kwargs: user inputs
-
-    Returns: None
-
+    Returns:
+        None
     """
     # make sure pass platform through
     kwargs['platform'] = platform
+    suppress_warnings(show_warnings=show_warnings)
 
     _print_params()
 
@@ -74,8 +76,8 @@ def run_experiment(**kwargs):
 
 
 if __name__ == "__main__":
-    # platform = Platform('CALCULON')
-    platform = Platform('IDMCLOUD')
+    platform = Platform('CALCULON', node_group='idm_48cores')
+    # platform = Platform('IDMCLOUD', node_group='emod_abcd')
 
     # To use Slurm Platform: Specify job directory
     # job_directory = r'C:\Projects\emodpy-snt\data\TEST_DEST'
@@ -87,4 +89,4 @@ if __name__ == "__main__":
     # dtk.setup(pathlib.Path(manifest.eradication_path).parent)
     # os.chdir(os.path.dirname(__file__))
     # print("...done.")
-    run_experiment()
+    run_experiment(show_warnings=False)

@@ -1,10 +1,15 @@
 import manifest
 import params
 from idmtools.core.platform_factory import Platform
+
+import logging
+from snt.utility.logger_utils import general_check
+
+general_check(module_name=__name__, log_msg=False)
+
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.templated_simulation import TemplatedSimulations
-from config_sweep_builders import get_sweep_builders
-from config_task import get_task
+from snt.utility.emod_api_utils import suppress_warnings
 
 
 def _print_params():
@@ -36,6 +41,8 @@ def _config_experiment(**kwargs):
     Return:
         experiment
     """
+    from config_task import get_task
+    from config_sweep_builders import get_sweep_builders
 
     builders = get_sweep_builders(**kwargs)
 
@@ -51,22 +58,23 @@ def _config_experiment(**kwargs):
     return experiment
 
 
-def run_experiment(**kwargs):
+def run_experiment(show_warnings: bool = True, **kwargs):
     """
-    Get configured calibration and run
+    Get configured calibration and run.
     Args:
+        show_warnings: True/False
         kwargs: user inputs
-
-    Returns: None
-
+    Returns:
+        None
     """
     # make sure pass platform through
     kwargs['platform'] = platform
+    suppress_warnings(show_warnings=show_warnings)
 
     _print_params()
 
     experiment = _config_experiment(**kwargs)
-    experiment.run(wait_until_done=False, wait_on_done=False)
+    experiment.run(wait_until_done=False, wait_on_done=True)
     _post_run(experiment, **kwargs)
 
 
@@ -80,4 +88,4 @@ if __name__ == "__main__":
     # dtk.setup(pathlib.Path(manifest.eradication_path).parent)
     # os.chdir(os.path.dirname(__file__))
     # print("...done.")
-    run_experiment()
+    run_experiment(show_warnings=False)

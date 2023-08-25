@@ -126,7 +126,6 @@ class InterventionSuite:
                 'coverage': row[key],
                 'agemin': value[0],
                 'agemax': value[1],
-                'seek': 1,
                 'rate': rates
             })
         add_treatment_seeking(campaign, start_day=start_day, targets=targets, drug=['Artemether', 'Lumefantrine'],
@@ -140,7 +139,6 @@ class InterventionSuite:
                 'coverage': row[key],
                 'agemin': value[0],
                 'agemax': value[1],
-                'seek': 1,
                 'rate': severe_rates
             })
         add_treatment_seeking(campaign, start_day=start_day, targets=targets, drug=['Artemether', 'Lumefantrine'],

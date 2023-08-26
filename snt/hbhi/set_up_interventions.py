@@ -126,7 +126,6 @@ class InterventionSuite:
                 'coverage': row[key],
                 'agemin': value[0],
                 'agemax': value[1],
-                'seek': 1,
                 'rate': rates
             })
         add_treatment_seeking(campaign, start_day=start_day, targets=targets, drug=['Artemether', 'Lumefantrine'],
@@ -140,7 +139,6 @@ class InterventionSuite:
                 'coverage': row[key],
                 'agemin': value[0],
                 'agemax': value[1],
-                'seek': 1,
                 'rate': severe_rates
             })
         add_treatment_seeking(campaign, start_day=start_day, targets=targets, drug=['Artemether', 'Lumefantrine'],
@@ -318,7 +316,7 @@ class InterventionSuite:
                                      blocking_rate=row['blocking_rate'],
                                      age_bin=self.itn_cov_age_bin,
                                      usages=[x * self.itn_leak_factor for x in usages],
-                                     trigger_condition_list=['ReceivedTreatment'])
+                                     trigger_condition_list=['Received_Treatment'])
 
     def add_ds_vaccsmc(self, campaign, smc_df, my_ds):
         ds_col = self.smc_ds_col
@@ -861,7 +859,7 @@ def add_all_interventions(campaign, int_suite, my_ds, hs_df=pd.DataFrame(),
     if not hs_df.empty:
         has_cm = int_suite.add_ds_hs(campaign, hs_df, my_ds)
         if has_cm:
-            event_list.append('ReceivedTreatment')
+            event_list.append('Received_Treatment')
             event_list.append('Received_Severe_Treatment')
 
     if not rtss_df.empty:

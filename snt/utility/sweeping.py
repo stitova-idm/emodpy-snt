@@ -1,6 +1,9 @@
 import numpy as np
 from typing import Dict, Any, List
 from idmtools.entities.simulation import Simulation
+from logging import getLogger, DEBUG
+
+logger = getLogger()
 
 
 ##################################################
@@ -78,7 +81,8 @@ class ItvFn:
         # update config for adhoc events
         adhoc_events = campaign.get_adhocs()
         if len(adhoc_events) > 0:
-            print("Found adhoc events in campaign. Needs some special processing behind the scenes.")
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Found adhoc events in campaign. Needs some special processing behind the scenes.")
             if "Custom_Individual_Events" in simulation.task.config.parameters:
                 ev_exist = set(simulation.task.config.parameters.Custom_Individual_Events)
                 ev_addhoc = set(adhoc_events.keys())

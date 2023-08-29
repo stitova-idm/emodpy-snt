@@ -8,6 +8,7 @@ import emod_api.config.default_from_schema_no_validation as dfs
 from emodpy_malaria.malaria_config import configure_linear_spline, set_species_param
 from snt.algorithms.optim_tool import OptimTool
 from snt.calibration.SeasonalityCalibSite import SeasonalityCalibSite
+from snt.utility.emod_api_utils import suppress_warnings
 
 import manifest
 import params
@@ -42,8 +43,8 @@ def constrain_sample(sample):
     Args:
         sample: represents a sample used to generate simulations
 
-    Returns: sample
-
+    Returns:
+        sample
     """
     return sample
 
@@ -72,14 +73,8 @@ def map_sample_to_model_input(simulation, sample):
 
     habitat = dfs.schema_to_config_subnode(manifest.schema_file, ["idmTypes", "idmType:VectorHabitat"])
     for (s, sp) in zip(params.fractions, ['arabiensis', 'funestus', 'gambiae']):
-        # ZDU: wrong!
-        # hab = copy.deepcopy(params.ls_hab_ref)
-        # hab['Capacity_Distribution_Over_Time']['Values'] = list(my_spline)
-        # hab['Max_Larval_Capacity'] = pow(10, maxvalue) * s
-        # set_species_param(simulation.task.config, sp, "Habitats", hab, overwrite=True)
-
         linear_spline_habitat = configure_linear_spline(manifest,
-                                                        max_larval_capacity=pow(10, maxvalue)*s,
+                                                        max_larval_capacity=pow(10, maxvalue) * s,
                                                         capacity_distribution_number_of_years=1,
                                                         capacity_distribution_over_time={
                                                             "Times": [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304,
@@ -91,7 +86,7 @@ def map_sample_to_model_input(simulation, sample):
 
         new_habitat = copy.deepcopy(habitat)
         new_habitat.parameters.Habitat_Type = "CONSTANT"
-        new_habitat.parameters.Max_Larval_Capacity = pow(10, const)*s
+        new_habitat.parameters.Max_Larval_Capacity = pow(10, const) * s
         set_species_param(simulation.task.config, sp, "Habitats", new_habitat.parameters)
 
     # tags.update({'Pop_Scale' : 1})
@@ -136,7 +131,6 @@ def _config_manager(task):
 def get_manager(**kwargs):
     """
     Config a task and then config a CalibManager.
-
     Args:
         kwargs: user inputs
     Returns:
@@ -153,15 +147,23 @@ def get_manager(**kwargs):
     return calib_manager
 
 
-def run_calibration(**kwargs):
+def run_calibration(directory: str = '.', show_warnings: bool = True, **kwargs):
     """
     Get configured calibration and run.
     Args:
+        directory: str, where to keep calibration results
+        show_warnings: True/False
         kwargs: user inputs
     Returns:
         None
     """
+    # make sure pass platform through
     kwargs['platform'] = platform
+    kwargs['directory'] = directory
+
+    # Suppress emod_api warnings
+    suppress_warnings(show_warnings=show_warnings)
+
     print_params()
 
     calib_manager = get_manager(**kwargs)
@@ -180,5 +182,5 @@ if __name__ == "__main__":
     # print("...done.")
 
     # Specify local folder for calibration results
-    directory = r'C:\Projects\emodpy-snt\data\TEST_DEST_CALIBRA'
-    run_calibration(directory=directory)
+    directory = r'C:\Projects\emodpy-snt\data\TEST_DEST_CALIBRA4'
+    run_calibration(directory=directory, show_warnings=False)

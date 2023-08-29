@@ -13,13 +13,12 @@ platform = None
 
 def _config_reports(task):
     """
-    Add reports
+    Add reports.
 
     Args:
         task: EMODTask
-
-    Returns: None
-
+    Returns:
+        None
     """
     from emodpy_malaria.reporters.builtin import add_report_malaria_filtered
     from emodpy_malaria.reporters.builtin import add_malaria_summary_report
@@ -44,7 +43,7 @@ def _config_reports(task):
 
 def build_campaign():
     """
-    Adding required interventions
+    Adding required interventions.
 
     Returns:
         campaign object
@@ -55,7 +54,6 @@ def build_campaign():
     campaign.schema_path = manifest.schema_file
 
     from emodpy_malaria.interventions.outbreak import add_outbreak_individual
-    # recurring_outbreak(cb, start_day=35, outbreak_fraction=0.002, tsteps_btwn=73)
     add_outbreak_individual(campaign, start_day=35, demographic_coverage=0.002, timesteps_between_repetitions=73)
 
     return campaign
@@ -67,7 +65,6 @@ def set_param_fn(config):
 
     Args:
         config:
-
     Returns:
         configuration settings
     """
@@ -89,10 +86,8 @@ def get_task(**kwargs):
 
     Args:
         kwargs: optional parameters
-
     Returns:
         task
-
     """
     global platform
     platform = kwargs.get('platform', None)

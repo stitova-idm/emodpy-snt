@@ -9,7 +9,6 @@ def set_config(config):
     set_drug_params(config)
 
     config.parameters.Simulation_Duration = params.years * 365
-    config.parameters.Serialized_Population_Writing_Type = 'NONE'  # TODO: remove
 
     # move to here from set_input_files
     config.parameters.Demographics_Filenames = [params.demographics_file]

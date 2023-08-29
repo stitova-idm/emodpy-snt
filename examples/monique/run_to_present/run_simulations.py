@@ -1,12 +1,6 @@
 import manifest
 import params
 from idmtools.core.platform_factory import Platform
-
-import logging
-from snt.utility.logger_utils import general_check
-
-general_check(module_name=__name__, log_msg=False)
-
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from snt.utility.emod_api_utils import suppress_warnings
@@ -31,6 +25,7 @@ def _post_run(experiment: Experiment, **kwargs):
         experiment: idmtools Experiment
         kwargs: additional parameters
     Return:
+        None
     """
     pass
 
@@ -38,6 +33,8 @@ def _post_run(experiment: Experiment, **kwargs):
 def _config_experiment(**kwargs):
     """
     Build experiment from task and builder. task is EMODTask. builder is SimulationBuilder used for config parameter sweeping.
+    Args:
+        kwargs: additional parameters
     Return:
         experiment
     """
@@ -69,6 +66,8 @@ def run_experiment(show_warnings: bool = True, **kwargs):
     """
     # make sure pass platform through
     kwargs['platform'] = platform
+
+    # Suppress emod_api warnings
     suppress_warnings(show_warnings=show_warnings)
 
     _print_params()

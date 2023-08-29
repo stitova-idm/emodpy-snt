@@ -43,8 +43,8 @@ def constrain_sample(sample):
     Args:
         sample: represents a sample used to generate simulations
 
-    Returns: sample
-
+    Returns:
+        sample
     """
     return sample
 
@@ -73,12 +73,6 @@ def map_sample_to_model_input(simulation, sample):
 
     habitat = dfs.schema_to_config_subnode(manifest.schema_file, ["idmTypes", "idmType:VectorHabitat"])
     for (s, sp) in zip(params.fractions, ['arabiensis', 'funestus', 'gambiae']):
-        # ZDU: wrong!
-        # hab = copy.deepcopy(params.ls_hab_ref)
-        # hab['Capacity_Distribution_Over_Time']['Values'] = list(my_spline)
-        # hab['Max_Larval_Capacity'] = pow(10, maxvalue) * s
-        # set_species_param(simulation.task.config, sp, "Habitats", hab, overwrite=True)
-
         linear_spline_habitat = configure_linear_spline(manifest,
                                                         max_larval_capacity=pow(10, maxvalue) * s,
                                                         capacity_distribution_number_of_years=1,
@@ -137,7 +131,6 @@ def _config_manager(task):
 def get_manager(**kwargs):
     """
     Config a task and then config a CalibManager.
-
     Args:
         kwargs: user inputs
     Returns:
@@ -167,6 +160,8 @@ def run_calibration(directory: str = '.', show_warnings: bool = True, **kwargs):
     # make sure pass platform through
     kwargs['platform'] = platform
     kwargs['directory'] = directory
+
+    # Suppress emod_api warnings
     suppress_warnings(show_warnings=show_warnings)
 
     print_params()

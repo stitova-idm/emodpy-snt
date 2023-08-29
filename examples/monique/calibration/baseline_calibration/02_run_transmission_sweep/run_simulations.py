@@ -25,6 +25,7 @@ def _post_run(experiment: Experiment, **kwargs):
         experiment: idmtools Experiment
         kwargs: additional parameters
     Return:
+        None
     """
     pass
 
@@ -32,6 +33,8 @@ def _post_run(experiment: Experiment, **kwargs):
 def _config_experiment(**kwargs):
     """
     Build experiment from task and builder. task is EMODTask. builder is SimulationBuilder used for config parameter sweeping.
+    Args:
+        kwargs: additional parameters
     Return:
         experiment
     """
@@ -63,6 +66,8 @@ def run_experiment(show_warnings: bool = True, **kwargs):
     """
     # make sure pass platform through
     kwargs['platform'] = platform
+
+    # Suppress emod_api warnings
     suppress_warnings(show_warnings=show_warnings)
 
     _print_params()

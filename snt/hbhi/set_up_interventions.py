@@ -828,7 +828,7 @@ def add_all_interventions(campaign, int_suite, my_ds, hs_df=pd.DataFrame(),
                           rtss_df=pd.DataFrame(),
                           pmc_df=pd.DataFrame(),
                           addtl_smc_func=None,
-                          nmf_as_default=True):
+                          nmf_as_default=False):
     if nmf_as_default:
         event_list = ['Received_NMF_Treatment']
     else:

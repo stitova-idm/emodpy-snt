@@ -49,7 +49,7 @@ def set_config(config):
 
         new_habitat = copy.deepcopy(habitat)
         new_habitat.parameters.Habitat_Type = "CONSTANT"
-        new_habitat.parameters.Max_Larval_Capacity = pow(10, params.max_habitat_value) * s
+        new_habitat.parameters.Max_Larval_Capacity = pow(10, params.const_habitat) * s
         set_species_param(config, sp, "Habitats", new_habitat.parameters)
 
     return config

@@ -741,7 +741,7 @@ def add_epi_rtss(campaign, rtss_df):
                                   vaccine_initial_effect=init_eff,
                                   vaccine_box_duration=0,
                                   vaccine_decay_time_constant=decay_t,
-                                  Received_Treatmentcy_is_multiplicative=False)
+                                  efficacy_is_multiplicative=False)
         else:
 
             add_triggered_vaccine(campaign,
@@ -754,7 +754,7 @@ def add_epi_rtss(campaign, rtss_df):
                                   vaccine_initial_effect=init_eff,
                                   vaccine_box_duration=0,
                                   vaccine_decay_time_constant=decay_t,
-                                  efficacy_is_multiplicative=True
+                                  efficacy_is_multiplicative=False
                                   )
 
 
@@ -777,7 +777,7 @@ def add_campaign_rtss(campaign, rtss_df):
                                   vaccine_initial_effect=row['initial_effect'],
                                   vaccine_box_duration=0,
                                   vaccine_decay_time_constant=row['decay_time_constant'],
-                                  efficacy_is_multiplicative=True)
+                                  efficacy_is_multiplicative=False)
 
         elif vtype == 'booster2':
             add_scheduled_vaccine(campaign,
@@ -794,7 +794,7 @@ def add_campaign_rtss(campaign, rtss_df):
                                   vaccine_initial_effect=row['initial_effect'],
                                   vaccine_box_duration=0,
                                   vaccine_decay_time_constant=row['decay_time_constant'],
-                                  efficacy_is_multiplicative=True)
+                                  efficacy_is_multiplicative=False)
         elif vtype == 'booster3':
             add_scheduled_vaccine(campaign,
                                   start_day=row['RTSS_day'],
@@ -810,7 +810,7 @@ def add_campaign_rtss(campaign, rtss_df):
                                   vaccine_initial_effect=row['initial_effect'],
                                   vaccine_box_duration=0,
                                   vaccine_decay_time_constant=row['decay_time_constant'],
-                                  efficacy_is_multiplicative=True)
+                                  efficacy_is_multiplicative=False)
         else:
             add_scheduled_vaccine(campaign,
                                   start_day=row['RTSS_day'],
@@ -825,7 +825,7 @@ def add_campaign_rtss(campaign, rtss_df):
                                   vaccine_initial_effect=row['initial_effect'],
                                   vaccine_box_duration=0,
                                   vaccine_decay_time_constant=row['decay_time_constant'],
-                                  efficacy_is_multiplicative=True)
+                                  efficacy_is_multiplicative=False)
 
 
 def add_ds_rtss(campaign, rtss_df, hfca):

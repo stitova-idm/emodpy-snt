@@ -566,7 +566,7 @@ class InterventionSuite:
                                           vaccine_initial_effect=init_eff,
                                           vaccine_box_duration=0,
                                           vaccine_decay_time_constant=decay_t,
-                                          efficacy_is_multiplicative=True)
+                                          efficacy_is_multiplicative=False)
 
                 else:
                     add_triggered_vaccine(campaign,
@@ -579,7 +579,7 @@ class InterventionSuite:
                                           vaccine_initial_effect=init_eff,
                                           vaccine_box_duration=0,
                                           vaccine_decay_time_constant=decay_t,
-                                          efficacy_is_multiplicative=True)
+                                          efficacy_is_multiplicative=False)
 
     def add_campaign_rtss(self, campaign, rtss_df):
         for r, row in rtss_df.iterrows():
@@ -601,7 +601,7 @@ class InterventionSuite:
                                       vaccine_initial_effect=row[self.rtss_init_eff_col],
                                       vaccine_box_duration=0,
                                       vaccine_decay_time_constant=row[self.rtss_decay_t_col],
-                                      efficacy_is_multiplicative=True)
+                                      efficacy_is_multiplicative=False)
             elif vtype == 'booster2':
                 add_scheduled_vaccine(campaign,
                                       start_day=row[self.rtss_start_col],
@@ -617,7 +617,7 @@ class InterventionSuite:
                                       vaccine_initial_effect=row[self.rtss_init_eff_col],
                                       vaccine_box_duration=0,
                                       vaccine_decay_time_constant=row[self.rtss_decay_t_col],
-                                      efficacy_is_multiplicative=True)
+                                      efficacy_is_multiplicative=False)
             elif vtype == 'booster3':
                 add_scheduled_vaccine(campaign,
                                       start_day=row[self.rtss_start_col],
@@ -633,7 +633,7 @@ class InterventionSuite:
                                       vaccine_initial_effect=row[self.rtss_init_eff_col],
                                       vaccine_box_duration=0,
                                       vaccine_decay_time_constant=row[self.rtss_decay_t_col],
-                                      efficacy_is_multiplicative=True)
+                                      efficacy_is_multiplicative=False)
             else:
                 add_scheduled_vaccine(campaign,
                                       start_day=row[self.rtss_start_col],
@@ -648,7 +648,7 @@ class InterventionSuite:
                                       vaccine_initial_effect=row[self.rtss_init_eff_col],
                                       vaccine_box_duration=0,
                                       vaccine_decay_time_constant=row[self.rtss_decay_t_col],
-                                      efficacy_is_multiplicative=True)
+                                      efficacy_is_multiplicative=False)
 
     def add_ds_rtss(self, campaign, rtss_df, my_ds):
         rtss_df = rtss_df[rtss_df[self.rtss_ds_col].str.upper() == my_ds.upper()]

@@ -28,6 +28,10 @@ def _post_run(experiment: Experiment, **kwargs):
     Return:
         None
     """
+    # Save experiment id to file to be used by snakefile
+    with open("experiment_id", "w") as fd:
+        fd.write(experiment.uid.hex)
+
     pass
 
 

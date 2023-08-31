@@ -8,8 +8,8 @@ test_run = False
 # parameters
 expname = 'PfPR_calibration_burnin_sweep_example'
 population_size = 6000  # if this population size is different that what was used for seasonality calibration, need to run '00_rescale_demog_vector_files.py'
-num_seeds = 5
-years = 30
+num_seeds = 1
+years = 10
 serialize = True
 pull_from_serialization = False
 itn_anc_adult_birthday_years = [20, 22, 24, 26, 28]

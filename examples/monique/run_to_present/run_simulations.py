@@ -3,7 +3,6 @@ import params
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.templated_simulation import TemplatedSimulations
-from snt.utility.emod_api_utils import suppress_warnings
 
 
 def _print_params():
@@ -16,6 +15,20 @@ def _print_params():
     print("num_seeds: ", params.num_seeds)
     print("years: ", params.years)
     print("pull_from_serialization: ", params.pull_from_serialization)
+
+
+def _pre_run(experiment: Experiment, **kwargs):
+    """
+    Add extra work after run experiment.
+    Args:
+        experiment: idmtools Experiment
+        kwargs: additional parameters
+    Return:
+        None
+    """
+    from snt.utility.plugins import initialize_plugins
+    show_warnings_once = kwargs.get('show_warnings_once', None)
+    initialize_plugins(show_warnings_once)
 
 
 def _post_run(experiment: Experiment, **kwargs):
@@ -67,17 +80,20 @@ def run_experiment(show_warnings: bool = True, **kwargs):
     # make sure pass platform through
     kwargs['platform'] = platform
 
-    # Suppress emod_api warnings
-    suppress_warnings(show_warnings=show_warnings)
-
     _print_params()
 
     experiment = _config_experiment(**kwargs)
-    experiment.run(wait_until_done=False, wait_on_done=True)
+    _pre_run(experiment, **kwargs)
+    experiment.run(wait_until_done=False, wait_on_done=False, **kwargs)
     _post_run(experiment, **kwargs)
 
 
 if __name__ == "__main__":
+    """
+    - show_warnings_once=True:  show api warnings for only one simulation
+    - show_warnings_once=False: show api warnings for all simulations
+    - show_warnings_once=None:  not show api warnings
+    """
     platform = Platform('CALCULON', node_group='idm_48cores')
     # platform = Platform('IDMCLOUD', node_group='emod_abcd')
 
@@ -87,4 +103,4 @@ if __name__ == "__main__":
     # dtk.setup(pathlib.Path(manifest.eradication_path).parent)
     # os.chdir(os.path.dirname(__file__))
     # print("...done.")
-    run_experiment(show_warnings=False)
+    run_experiment(show_warnings_once=True)

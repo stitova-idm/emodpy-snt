@@ -8,7 +8,6 @@ import emod_api.config.default_from_schema_no_validation as dfs
 from emodpy_malaria.malaria_config import configure_linear_spline, set_species_param
 from snt.algorithms.optim_tool import OptimTool
 from snt.calibration.SeasonalityCalibSite import SeasonalityCalibSite
-from snt.utility.emod_api_utils import suppress_warnings
 
 import manifest
 import params
@@ -26,6 +25,20 @@ def print_params():
     print("later_round: ", params.later_round)
     print("round_number: ", params.round_number)
     print("burnin_ids: ", params.burnin_ids)
+
+
+def _pre_run(**kwargs):
+    """
+    Add extra work before run experiment.
+    Args:
+        experiment: idmtools Experiment
+        kwargs: additional parameters
+    Return:
+        None
+    """
+    from snt.utility.plugins import initialize_plugins
+    show_warnings_once = kwargs.get('show_warnings_once', None)
+    initialize_plugins(show_warnings_once)
 
 
 def constrain_sample(sample):
@@ -161,16 +174,19 @@ def run_calibration(directory: str = '.', show_warnings: bool = True, **kwargs):
     kwargs['platform'] = platform
     kwargs['directory'] = directory
 
-    # Suppress emod_api warnings
-    suppress_warnings(show_warnings=show_warnings)
-
     print_params()
 
     calib_manager = get_manager(**kwargs)
+    _pre_run(**kwargs)
     calib_manager.run_calibration(**kwargs)
 
 
 if __name__ == "__main__":
+    """
+    - show_warnings_once=True:  show api warnings for only one simulation
+    - show_warnings_once=False: show api warnings for all simulations
+    - show_warnings_once=None:  not show api warnings
+    """
     platform = Platform('CALCULON', node_group='idm_48cores')
     # platform = Platform('IDMCLOUD', node_group='emod_abcd')
 
@@ -181,6 +197,4 @@ if __name__ == "__main__":
     # os.chdir(os.path.dirname(__file__))
     # print("...done.")
 
-    # Specify local folder for calibration results
-    directory = r'C:\Projects\emodpy-snt\data\TEST_DEST_CALIBRA4'
-    run_calibration(directory=directory, show_warnings=False)
+    run_calibration(directory=manifest.directory, show_warnings_once=True)

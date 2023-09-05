@@ -18,7 +18,7 @@ def _print_params():
 
 def _post_run(experiment: Experiment, **kwargs):
     """
-    Add extra work after run experiment.
+    Add extra work before run experiment.
     Args:
         experiment: idmtools Experiment
         kwargs: additional parameters

@@ -19,3 +19,6 @@ data_path, project_path = load_box_paths(user_path=USER_PATH, country_name='Exam
 input_dir = os.path.join(project_path, "simulation_inputs")
 
 sif_id = None
+
+# Specify local folder for calibration results, for example
+directory = os.path.join(CURRENT_DIR, 'Calibra_results')

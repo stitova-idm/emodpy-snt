@@ -130,7 +130,8 @@ if __name__ == "__main__":
         else:
             args_treat_case = args_each
         if end_year > 2022:
-            analysis = PlatformAnalysis(experiment_ids=[exp_id],
+            analysis = PlatformAnalysis(platform=platform,
+                                        experiment_ids=[exp_id],
                                         analyzers=analyzers,
                                         analyzers_args=[
                                             args_each,
@@ -145,7 +146,8 @@ if __name__ == "__main__":
                                         ],
                                         analysis_name=wi_name)
         else:
-            analysis = PlatformAnalysis(experiment_ids=[exp_id],
+            analysis = PlatformAnalysis(platform=platform,
+                                        experiment_ids=[exp_id],
                                         analyzers=analyzers,
                                         analyzers_args=[
                                             args_each,

@@ -10,7 +10,7 @@ from snt.load_paths import load_box_paths
 # Specify data location
 USER_PATH = None
 USER_PATH = r'C:\Projects\emodpy-snt\data'
-_, project_path = load_box_paths(user_path=USER_PATH, country_name='Example')
+_,  project_path = load_box_paths(user_path=USER_PATH, country_name='Example')
 
 
 def update_demog_and_vector_pop(demog_filepath, larval_habitat_filepath, new_pop_size):

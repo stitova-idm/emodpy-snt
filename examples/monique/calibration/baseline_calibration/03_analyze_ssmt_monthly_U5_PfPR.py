@@ -3,17 +3,19 @@ from idmtools.core.platform_factory import Platform
 from idmtools.analysis.platform_anaylsis import PlatformAnalysis
 from snt.analyzers.analyze_monthly_pfpr_u5 import MonthlyPfPRU5Analyzer
 
-experiments = {
-    'PfPR_sweep_main_example': '1b983581-a50b-ee11-aa07-b88303911bc1'
-}
+# experiments = {
+#     'PfPR_sweep_main_example': '1b983581-a50b-ee11-aa07-b88303911bc1'
+# }
+
+experiments = {'PfPR_sweep_main_example': 'ddb60ef1a34dee11aa0ab88303911bc1'}
 start_year = 2010
 end_year = 2017
 
 working_dir = "."
 
 if __name__ == "__main__":
-    # platform = Platform('Calculon')
-    platform = Platform('IDMCLOUD')
+    platform = Platform('Calculon')
+    # platform = Platform('IDMCLOUD')
 
     analyzers = [MonthlyPfPRU5Analyzer]
 
@@ -35,9 +37,13 @@ if __name__ == "__main__":
                      'start_year': start_year,
                      'end_year': end_year
                      }
-        analysis = PlatformAnalysis(experiment_ids=[exp_id],
+        analysis = PlatformAnalysis(platform=platform,
+                                    experiment_ids=[exp_id],
                                     analyzers=analyzers,
                                     analyzers_args=[args_each] * len(analyzers),
                                     analysis_name=wi_name)
 
         analysis.analyze()
+
+experiments = {'PfPR_sweep_main_example': 'ddb60ef1a34dee11aa0ab88303911bc1'}
+experiments = {'PfPR_sweep_main_example': '20c71292a74dee11aa0ab88303911bc1'}

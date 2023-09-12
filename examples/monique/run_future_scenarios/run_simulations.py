@@ -27,8 +27,7 @@ def _pre_run(experiment: Experiment, **kwargs):
         None
     """
     from snt.utility.plugins import initialize_plugins
-    show_warnings_once = kwargs.get('show_warnings_once', None)
-    initialize_plugins(show_warnings_once)
+    initialize_plugins(**kwargs)
 
 
 def _post_run(experiment: Experiment, **kwargs):
@@ -68,11 +67,10 @@ def _config_experiment(**kwargs):
     return experiment
 
 
-def run_experiment(show_warnings: bool = True, **kwargs):
+def run_experiment(**kwargs):
     """
-    Get configured calibration and run.
+    Get configured experiment and run.
     Args:
-        show_warnings: True/False
         kwargs: user inputs
     Returns:
         None
@@ -84,7 +82,7 @@ def run_experiment(show_warnings: bool = True, **kwargs):
 
     experiment = _config_experiment(**kwargs)
     _pre_run(experiment, **kwargs)
-    experiment.run(wait_until_done=False, wait_on_done=False, **kwargs)
+    experiment.run(**kwargs)
     _post_run(experiment, **kwargs)
 
 

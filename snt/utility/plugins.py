@@ -1,38 +1,31 @@
-import os
-import typing
-from idmtools.assets import AssetCollection
-from idmtools.entities.experiment import Experiment
+import warnings
 from idmtools.entities.simulation import Simulation
 from idmtools.registry.hook_specs import IDMTOOLS_HOOKS
 from idmtools.registry.functions import FunctionPluginManager
-from pluggy import HookspecMarker, HookimplMarker
 import emod_api.schema_to_class as s2c
+from pluggy import HookimplMarker
 from threading import Lock
 
-# if typing.TYPE_CHECKING:
-#     from idmtools.assets import AssetCollection
-
-# function_hook_spec = HookspecMarker(IDMTOOLS_HOOKS)
 function_hook_impl = HookimplMarker(IDMTOOLS_HOOKS)
 
-HTML_FILES = ["AllInsets.html", "BinnedReport.html", "MalariaInterventions.html", "MalariaSummaryReport.html"]
+MSG = 'We are hiding warnings just for clarity purpose. Users should pay attention to the warnings and adjust coding to avoid such warnings in the future.'
 
 show_warnings_lock = Lock()
 SHOW_WARNINGS = None
 WARNINGS_ONCE = None
 
 
-def initialize_plugins(show_warnings_once: bool = True):
+def initialize_plugins(**kwargs):
     """
     Setup plugins.
     Args:
-        show_warnings_once: True/False
+        kwargs: user inputs
     Returns:
         None
     """
     global WARNINGS_ONCE
-    WARNINGS_ONCE = show_warnings_once
-    _initialize_warnings(show_warnings_once)
+    WARNINGS_ONCE = kwargs.get('show_warnings_once', None)
+    _initialize_warnings(WARNINGS_ONCE)
 
     # register plugins
     pm = FunctionPluginManager.instance()
@@ -80,9 +73,7 @@ def _suppress_api_warnings():
 
 
 def display_info():
-    import warnings
-    msg = 'We are hiding warnings just for clarity purpose. Users should pay attention to the warnings and adjust coding to avoid such warnings in the future.'
-    warnings.warn(msg, UserWarning)
+    warnings.warn(MSG, UserWarning)
 
 
 class Plugin_pre_create:

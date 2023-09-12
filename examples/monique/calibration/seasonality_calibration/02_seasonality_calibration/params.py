@@ -16,9 +16,7 @@ max_incidence = 100
 rep_admin = 'AA'
 # burn-in id should be listed for each of the archetypes
 burnin_ids = {
-    # 'AA': '7c9195e8-3d0a-ee11-aa07-b88303911bc1'
-    # 'AA': 'bd9177fc-ea35-ee11-aa09-b88303911bc1'    # Calculon
-    'AA': '7ff0bc4f-8943-ee11-aa09-b88303911bc1'
+    'AA': '7c9195e8-3d0a-ee11-aa07-b88303911bc1'
 }
 # set whether this is the first or second set of calibrations for this archetype
 round_number = 1  # <-- user needs to specify which round this is to pick up from prior round. Starts at round_number=1

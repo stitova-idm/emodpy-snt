@@ -16,6 +16,19 @@ def _print_params():
     print("years: ", params.years)
 
 
+def _pre_run(experiment: Experiment, **kwargs):
+    """
+    Add extra work before run experiment.
+    Args:
+        experiment: idmtools Experiment
+        kwargs: additional parameters
+    Return:
+        None
+    """
+    from snt.utility.plugins import initialize_plugins
+    initialize_plugins(**kwargs)
+
+
 def _post_run(experiment: Experiment, **kwargs):
     """
     Add extra work before run experiment.
@@ -53,11 +66,10 @@ def _config_experiment(**kwargs):
     return experiment
 
 
-def run_experiment(show_warnings: bool = True, **kwargs):
+def run_experiment(**kwargs):
     """
-    Get configured calibration and run.
+    Get configured experiment and run.
     Args:
-        show_warnings: True/False
         kwargs: user inputs
     Returns:
         None
@@ -68,7 +80,8 @@ def run_experiment(show_warnings: bool = True, **kwargs):
     _print_params()
 
     experiment = _config_experiment(**kwargs)
-    experiment.run(wait_until_done=False, wait_on_done=False)
+    _pre_run(experiment, **kwargs)
+    experiment.run(**kwargs)
     _post_run(experiment, **kwargs)
 
 

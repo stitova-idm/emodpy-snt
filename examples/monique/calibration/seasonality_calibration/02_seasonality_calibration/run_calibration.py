@@ -29,16 +29,14 @@ def print_params():
 
 def _pre_run(**kwargs):
     """
-    Add extra work before run experiment.
+    Add extra work before run calibration.
     Args:
-        experiment: idmtools Experiment
         kwargs: additional parameters
     Return:
         None
     """
     from snt.utility.plugins import initialize_plugins
-    show_warnings_once = kwargs.get('show_warnings_once', None)
-    initialize_plugins(show_warnings_once)
+    initialize_plugins(**kwargs)
 
 
 def constrain_sample(sample):
@@ -160,12 +158,11 @@ def get_manager(**kwargs):
     return calib_manager
 
 
-def run_calibration(directory: str = '.', show_warnings: bool = True, **kwargs):
+def run_calibration(directory: str = '.', **kwargs):
     """
     Get configured calibration and run.
     Args:
         directory: str, where to keep calibration results
-        show_warnings: True/False
         kwargs: user inputs
     Returns:
         None

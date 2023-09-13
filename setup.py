@@ -24,7 +24,7 @@ if develop_install:
 
 authors = [
     ("Clinton Collins", "Clinton.Collins@gatesfoundation.org"),
-    ("Zhaowei Du", "zhaoweidu@hotmail.com"),
+    ("Zhaowei Du", "zhaowei.du@gatesfoundation.org"),
     ("Svetlana Titova", "Svetlana.Titova@gatesfoundation.org")
 ]
 

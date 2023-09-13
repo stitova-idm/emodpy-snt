@@ -28,7 +28,6 @@ jobs:
           git config --global user.email "idmtools@idmod.org"
       - uses: actions/checkout@v2
       - name: Build and publish
-        working-directory: snt
         env:
           TWINE_REPOSITORY_URL: https://packages.idmod.org/api/pypi/idm-pypi-staging/
           TWINE_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}

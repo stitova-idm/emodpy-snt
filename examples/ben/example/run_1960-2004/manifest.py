@@ -10,8 +10,5 @@ download_dir = os.path.join(ROOT_DIR, "download")
 schema_file = os.path.join(download_dir, "schema.json")
 eradication_path = os.path.join(download_dir, "Eradication")
 
-# ep4_path = os.path.join(input_dir, "ep4")
-plugins_folder = os.path.join(download_dir, "plugins")
-
 # SIF PATH
 sif_path = '/projects/b1139/images/centos_dtk-build.sif'

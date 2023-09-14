@@ -24,7 +24,7 @@ if develop_install:
 
 authors = [
     ("Clinton Collins", "Clinton.Collins@gatesfoundation.org"),
-    ("Zhaowei Du", "zhaoweidu@hotmail.com"),
+    ("Zhaowei Du", "zhaowei.du@gatesfoundation.org"),
     ("Svetlana Titova", "Svetlana.Titova@gatesfoundation.org")
 ]
 
@@ -32,7 +32,7 @@ setup(
     name='snt',
     version='1.0.0',
     author=", ".join([author[0] for author in authors]),
-    author_email="zdu@idmod.org",
+    author_email=[author[1] for author in authors],
     description="SNT scripts and supporting libraries",
     install_requires=requirements,
     long_description=long_description,
@@ -42,6 +42,8 @@ setup(
     include_package_data=True,
     setup_requires=['wheel'],
     classifiers=[
-        "Programming Language :: Python :: 3",
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9'
     ]
 )

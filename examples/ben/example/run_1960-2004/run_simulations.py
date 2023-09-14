@@ -30,6 +30,8 @@ def _post_run(experiment: Experiment, **kwargs):
     Return:
         None
     """
+    with open("ben\\example\\run_1960-2004\\experiment_id.txt", "w") as fd:
+        fd.write(experiment.uid.hex)
     pass
 
 
@@ -76,7 +78,7 @@ def run_experiment(show_warnings: bool = True, **kwargs):
     _print_params()
 
     experiment = _config_experiment(**kwargs)
-    experiment.run(wait_until_done=False, wait_on_done=False)
+    experiment.run(wait_until_done=True, wait_on_done=False)
     _post_run(experiment, **kwargs)
 
 

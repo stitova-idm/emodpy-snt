@@ -27,6 +27,8 @@ def _post_run(experiment: Experiment, **kwargs):
     Return:
         None
     """
+    with open("monique\\run_future_scenarios\\experiment_id.txt", "w") as fd:
+        fd.write(experiment.uid.hex)
     pass
 
 

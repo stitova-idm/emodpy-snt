@@ -15,7 +15,7 @@ def save_best_seasonality_fit(project_path, experiment_names, admin_names):
     # create data frame to store results for all admins and seasonality parameters
     seasonality_fits = pd.DataFrame()
     for aa in range(len(admin_names)):
-        calib_result_filepath = os.path.join(project_path, 'simulation_output', 'seasonality_calibration',
+        calib_result_filepath = os.path.join(project_path, 'simulation_output', 'calibration',
                                              experiment_names[aa], 'CalibManager.json')
 
         f = open(calib_result_filepath)
@@ -39,7 +39,7 @@ def save_best_seasonality_fit_LL(project_path, experiment_names, admin_names):
     # create data frame to store results for all admins and seasonality parameters
     seasonality_fits = pd.DataFrame()
     for aa in range(len(admin_names)):
-        calib_result_filepath = os.path.join(project_path, 'simulation_output', 'seasonality_calibration',
+        calib_result_filepath = os.path.join(project_path, 'simulation_output', 'calibration',
                                              experiment_names[aa], '_plots', 'LL_all.csv')
         calib_result = pd.read_csv(calib_result_filepath)
         # use row with best match to reference dataset

@@ -16,20 +16,20 @@ def initialize_config(config, manifest, years, serialize, yr_plusone=True,
     Start a (default) MALARIA_SIM config builder with presets including:
     durations, logging, demographics, serialization, vector and reports.
 
-    Parameters:
-    config:
-    years: int
-        Simulation duration in years
-    serialize: bool
-        To serialize simulation outcome or not
-    yr_plusone: bool, default: True
-        For serialization, simulation duration needs to plus one day to work
-    ser_time_step: list of int, default: None
-        A list defining the sim day(s) to serialize the population. When set
-        to None, serialization will occur at `years*365`
-    x_pop_scale: int, default = 1
-        Scaling factor for simulation population,
-        applies to x_Base_Population, x_Birth, x_Temporary_Larval_Habitat
+    Args:
+        config:
+        years: int
+            Simulation duration in years
+        serialize: bool
+            To serialize simulation outcome or not
+        yr_plusone: bool, default: True
+            For serialization, simulation duration needs to plus one day to work
+        ser_time_step: list of int, default: None
+            A list defining the sim day(s) to serialize the population. When set
+            to None, serialization will occur at `years*365`
+        x_pop_scale: int, default = 1
+            Scaling factor for simulation population,
+            applies to x_Base_Population, x_Birth, x_Temporary_Larval_Habitat
 
     Returns:
         config
@@ -94,6 +94,7 @@ def initialize_reports(task, manifest, event_reporter: bool = False, filtered_re
                        years: float = None, yr_plusone: bool = True):
     """
     Initialize reports.
+
     Args:
         task: Task to which to add the reporter, if left as None, reporter is returned (used for unittests)
         event_reporter: bool, default = False
@@ -199,6 +200,7 @@ def add_input_files(task, iopath, my_ds, archetype_ds=None, demographic_suffix='
                     climate_suffix='', climate_prefix=True, use_archetype=True):
     """
     Add assets corresponding to the filename parameters set in set_input_files.
+
     Args:
         task:
         iopath:
@@ -299,56 +301,53 @@ def setup_ds(config, manifest, platform, my_ds, archetype_ds=None,
     to feed into the config builder. Usually used within `ModFn` and 
     `ModBuilder`.
 
-    Parameters
-    ----------
-    config: schema-backed config dictionary, written to config.json
-    platform:
-    manifest:
-    my_ds : str
-    archetype_ds : str, default: None
-        The archetype DS of `my_ds`
-    pull_from_serialization : bool, default: False
-    burnin_id : str, default: ''
-        Experiment ID to pull serialization from
-    ser_date : int, default: 50*365
-        Number of sim days in the serialized population
-    burnin_fname : str, default: ''
-        Path to csv files containing dataframe that specifies where to look
-        up for serialized populations; Only needed if `pull_from_serialization`
-        is True and ignore if `burnin_id` is specified
-    rel_abund_df : pandas.DataFrame, default: None
-        Data frame of relative vector abundance by DS (i.e., interspecies 
-        relative abundance)
-    lhdf : pandas.DataFrame, default: None
-        Data frame of larval habitats per month per DS
-    use_arch_burnin : bool, default: True
-        Pull serialization from corresponding archetype instead of DS itself
-    from_arch : bool, default: None
-        (deprecated) Same as `use_arch_burnin`, supersedes its value if not
-        `None`
-    demographic_suffix : str, default: ''
-        Default demographic input file is '(DSNAME)_demographic', this argument
-        adds suffix to input file name. Note: if set to `None`, demographic input
-        file will not be added
-    climate_suffix : str, default: ''
-        Same behaviour as `demographic_suffix`
-    climate_prefix : bool, default: True
-        Whether to add DS name in front of climate files.
-    use_arch_input : bool, default: True
-        If True, use archetype DS's demographic and climate input file instead
-    hab_multiplier : float, default: 1
-    run_number : int, default: -1
-        `run_number` will be matched with `run_number` of the serialized population
-        from the burnin experiment
-    ds_name : str, default: 'DS_Name'
-        The variable name that tags a simulation run to a DS; Could be 'LGA' in the
-        case of Nigeria
-    serialize_match_val:
-    serialize_match_tag:
+    Args:
+        config: schema-backed config dictionary, written to config.json
+        platform:
+        manifest:
+        my_ds : str
+        archetype_ds : str, default: None
+            The archetype DS of `my_ds`
+        pull_from_serialization : bool, default: False
+        burnin_id : str, default: ''
+            Experiment ID to pull serialization from
+        ser_date : int, default: 50*365
+            Number of sim days in the serialized population
+        burnin_fname : str, default: ''
+            Path to csv files containing dataframe that specifies where to look
+            up for serialized populations; Only needed if `pull_from_serialization`
+            is True and ignore if `burnin_id` is specified
+        rel_abund_df : pandas.DataFrame, default: None
+            Data frame of relative vector abundance by DS (i.e., interspecies
+            relative abundance)
+        lhdf : pandas.DataFrame, default: None
+            Data frame of larval habitats per month per DS
+        use_arch_burnin : bool, default: True
+            Pull serialization from corresponding archetype instead of DS itself
+        from_arch : bool, default: None
+            (deprecated) Same as `use_arch_burnin`, supersedes its value if not
+            `None`
+        demographic_suffix : str, default: ''
+            Default demographic input file is '(DSNAME)_demographic', this argument
+            adds suffix to input file name. Note: if set to `None`, demographic input
+            file will not be added
+        climate_suffix : str, default: ''
+            Same behaviour as `demographic_suffix`
+        climate_prefix : bool, default: True
+            Whether to add DS name in front of climate files.
+        use_arch_input : bool, default: True
+            If True, use archetype DS's demographic and climate input file instead
+        hab_multiplier : float, default: 1
+        run_number : int, default: -1
+            `run_number` will be matched with `run_number` of the serialized population
+            from the burnin experiment
+        ds_name : str, default: 'DS_Name'
+            The variable name that tags a simulation run to a DS; Could be 'LGA' in the
+            case of Nigeria
+        serialize_match_val:
+        serialize_match_tag:
     
-    Returns
-    -------
-    dict
+    Returns:
         Dictionary of two keys, the DS_Name and the corresponding archetype DS
     
     """
@@ -412,11 +411,12 @@ def add_recurring_outbreak(campaign):
     """
         Adds a recurring outbreak that starts on day 182, affects 0.01 of the populations,
         repeats every 365 days and repeats forever.
+
     Args:
         campaign: campaign object to which the intervention will be added, and schema_path container
 
     Returns:
-
+        Nothing
     """
 
     add_outbreak_individual(campaign, start_day=182, demographic_coverage=0.01, repetitions=-1,

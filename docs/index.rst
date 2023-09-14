@@ -3,9 +3,9 @@
 ==============================
 
 |EMODPY_snt| is a collection of Python scripts and utilities created to
-streamline user interactions with |EMOD_s| and |IT_s| for modeling malaria.
+streamline user interactions with |EMODPY_malaria| and |EMOD_s| and |IT_s| for modeling malaria.
 Much of  the functionality is inherited from the
-:doc:`emod_api:emod_api` and :doc:`emodpy:emodpy` and :doc:`emodpy-malaria:emodpy-malaria`
+:doc:`emod_api:emod_api` and :doc:`emodpy:emodpy` and :doc:`emodpy_malaria:emodpy_malaria`
 
 Additional information about how to use |IT_s| can be found in
 :doc:`idmtools:index`.  Additional information about |EMOD_s| malaria
@@ -33,3 +33,4 @@ disease transmission model.
    emod-api <https://docs.idmod.org/projects/emod-api/en/latest/>
    emodpy <https://docs.idmod.org/projects/emodpy/en/latest/>
    idmtools <https://docs.idmod.org/projects/idmtools/en/latest/>
+   emodpy-malaria <https://docs.idmod.org/projects/emodpy-malaria/en/latest/>

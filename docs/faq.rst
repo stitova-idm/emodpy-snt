@@ -7,11 +7,11 @@ questions are answered below. The most common questions are answered below.
 For questions related to functionality in related packages, see the
 following documentation:
 
-* :doc:`emod-snt:faq` for |EMOD_s|
+* :doc:`emodpy_malaria:faq` for |EMODPY_malaria|
+* :doc:`emod-malaria:faq` for |EMOD_s|
 * :doc:`idmtools:faq` for |IT_s|
 * :doc:`emod_api:faq` for |emod_api|
-* :doc:`emodpy:faq` for |EMODPY_s|  
-* :doc:`emodpy-malaria:faq` for |EMODPY_s|
+* :doc:`emodpy:faq` for |EMODPY_s|
 
 .. contents:: Contents
    :local:
@@ -124,7 +124,7 @@ How do I set configuration parameters?
 ======================================
 
 Define your own parameter-setting function such as ``set_param_fn`` and pass
-that function to the |EMODPY_s| task creator as the ``param_custom_cb``
+that function to the |EMODPY_snt| task creator as the ``param_custom_cb``
 parameter. In that function, you can set the parameters directly. For
 example:
 

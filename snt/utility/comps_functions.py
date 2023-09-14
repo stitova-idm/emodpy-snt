@@ -7,6 +7,16 @@ from COMPS.Data import QueryCriteria
 def retry_function(func, wait=1.5, max_retries=5):
     """
     Decorator allowing to retry the call to a function with some time in between.
+    Usage::
+
+        @retry_function
+        def my_func():
+            pass
+
+        @retry_function(max_retries=10, wait=2)
+        def my_func():
+            pass
+
     Args:
         func:
         wait:
@@ -14,16 +24,6 @@ def retry_function(func, wait=1.5, max_retries=5):
 
     Returns:
         None
-
-    Usage:
-
-    @retry_function
-    def my_func():
-        pass
-
-    @retry_function(max_retries=10, wait=2)
-    def my_func():
-        pass
 
     """
 

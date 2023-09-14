@@ -47,7 +47,7 @@ def retry_function(func, wait=1.5, max_retries=5):
 
 
 @retry_function
-def get_experiments_by_name(name, user=None):
+def get_experiments_by_name(name: str, user=None):
     filters = ["name~{}".format(name)]
     if user:
         filters.append("owner={}".format(user))
@@ -55,7 +55,7 @@ def get_experiments_by_name(name, user=None):
 
 
 @retry_function
-def get_experiments_by_name(name, user=None):
+def get_experiments_by_name(name: str, user=None):
     filters = ["name~{}".format(name)]
     if user:
         filters.append("owner={}".format(user))
@@ -63,6 +63,6 @@ def get_experiments_by_name(name, user=None):
 
 
 @retry_function
-def get_most_recent_experiment_id_by_name(name, user=None):
+def get_most_recent_experiment_id_by_name(name: str, user=None):
     experiments = {e.date_created: e for e in get_experiments_by_name(name, user)}
     return experiments[max(experiments.keys())].id

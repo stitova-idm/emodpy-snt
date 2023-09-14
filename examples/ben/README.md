@@ -30,3 +30,7 @@ python simulation/example/run_1960-2004.py
 python simulation/example/run_2005-2022.py
 ```
 
+
+# install to use Slurm Platform
+pip install idmtools-platform-slurm --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+

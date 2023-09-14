@@ -1,18 +1,10 @@
-from dtk.utils.core.DTKConfigBuilder import DTKConfigBuilder
 
-def initialize_cb (years, serialize, defaults='MALARIA_SIM', yr_plusone=True):
-    cb = DTKConfigBuilder.from_defaults(defaults)
-    cb.update_params({'Simulation_Duration': years*365+yr_plusone})
-    if serialize :
-        cb.update_params({
-            'Serialization_Time_Steps' : [365*years],
-            'Serialization_Type': 'TIMESTEP',
-            'Serialization_Mask_Node_Write': 0,  
-            # 0 corresponds to the previous version default: the same larval habitat 
-            # parameters will be used in the burnin and pickup (from the burnin config)
-            'Serialization_Precision': 'REDUCED'
-        })
-    else:
-        cb.update_params({
-            'Serialization_Type': 'NONE'
-        })
+def initialize_config(config, years, serialize, yr_plusone=True):
+    config.parameters.Simulation_Duration = years * 365 + yr_plusone
+    if serialize:
+        config.parameters.Serialization_Time_Steps = [365 * years]
+        config.parameters.Serialization_Type = "TIMESTEP"
+        config.parameters.Serialized_Population_Writing_Type = "TIMESTEP"
+        config.parameters.Serialization_Mask_Node_Write = 0
+        config.parameters.Serialization_Precision = "REDUCED"
+    # else: nothing to do, we're already not serializing

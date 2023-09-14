@@ -1,9 +1,11 @@
 import os
 import pandas as pd
 import numpy as np
+import emodpy_malaria.malaria_config as malaria_config
 from emodpy_malaria.malaria_config import configure_linear_spline, set_species_param, add_species
 from emod_api.interventions.common import change_individual_property_scheduled
 import emod_api.config.default_from_schema_no_validation as dfs
+
 
 def update_basic_params(config, manifest, project_path):
     vector_species = ['arabiensis', 'funestus', 'gambiae']
@@ -21,7 +23,7 @@ def update_basic_params(config, manifest, project_path):
     config.parameters.Report_Detection_Threshold_Blood_Smear_Parasites = 0
     config.parameters.Report_Parasite_Smear_Sensitivity = 0.01  # number of microliters of blood examined
     config.parameters.Incubation_Period_Distribution = 'CONSTANT_DISTRIBUTION'
-    config.parameters.Incubation_Period_Constant = 3  # parameter shortened from 7 to yield a 12-13 day incubation period
+    config.parameters.Incubation_Period_Constant = 7  # parameter shortened from 7 to yield a 12-13 day incubation period
 
     # read in and set vector bionomics
     vector_bionomics = pd.read_csv(os.path.join(project_path, 'simulation_inputs', 'vector_bionomics.csv'))
@@ -37,8 +39,6 @@ def update_basic_params(config, manifest, project_path):
     config.parameters.Enable_Initial_Prevalence = 1
     config.parameters.Base_Air_Temperature = 22
     config.parameters.Enable_Vector_Migration = 0
-
-
 
 
 def habitat_scales(project_path):
@@ -73,7 +73,6 @@ def set_up_hfca(config, manifest, hfca, archetype_hfca=None,
                 pull_from_serialization=False, ser_date=50 * 365,
                 hdf=None, lhdf=None, population_size=1000,
                 hab_multiplier=-1, run_number=-1, use_arch_burnin=False, ser_df=pd.DataFrame()):
-
     set_input_files(config, hfca, archetype_hfca, population_size)
     if not archetype_hfca:
         archetype_hfca = hfca
@@ -82,10 +81,12 @@ def set_up_hfca(config, manifest, hfca, archetype_hfca=None,
 
     if pull_from_serialization:
         hab_scale_factor_param_name = 'Habitat_Multiplier'
+        if 'Run_Number' in ser_df.columns.values:
+            ser_df['Run_Number'] = ser_df['Run_Number'].astype(int)
         if use_arch_burnin:
             if hab_multiplier >= 0 and run_number >= 0:
                 ser_df[hab_scale_factor_param_name] = ser_df[hab_scale_factor_param_name].apply(
-                    lambda x: np.round(x, 5))
+                    lambda x: np.round(float(x), 5))
                 sdf = ser_df[(ser_df[hab_scale_factor_param_name] >= (np.round(hab_multiplier, 5) - 0.00001)) &
                              (ser_df[hab_scale_factor_param_name] <= (np.round(hab_multiplier, 5) + 0.00001)) &
                              (ser_df['Run_Number'] == run_number) &
@@ -108,9 +109,6 @@ def set_up_hfca(config, manifest, hfca, archetype_hfca=None,
         config.parameters.Serialization_Mask_Node_Read = 0
         # 0 corresponds to the previous version default: the same larval habitat parameters will be used
         # in the burnin and pickup (from the burnin config)
-
-    else:
-        config.parameters.Serialized_Population_Reading_Type = 'NONE'
 
     return {'admin_name': hfca}
 
@@ -140,14 +138,13 @@ def set_habitats(config, manifest, hfca, hdf, lhdf, archetype_hfca, hab_multipli
                                                         }
                                                         )
         set_species_param(config, sp, "Habitats", linear_spline_habitat, overwrite=True)
-        new_habitat = dfs.schema_to_config_subnode(manifest.schema_file, ["idmTypes", "idmType:VectorHabitat"])
-        new_habitat.parameters.Habitat_Type = "CONSTANT"
-        new_habitat.parameters.Max_Larval_Capacity = pow(10, const) * s * const_mult
-        set_species_param(config, sp, "Habitats", new_habitat.parameters)
+        habitat = dfs.schema_to_config_subnode(manifest.schema_file, ["idmTypes", "idmType:VectorHabitat"])
+        habitat.parameters.Habitat_Type = "CONSTANT"
+        habitat.parameters.Max_Larval_Capacity = pow(10, const) * s * const_mult
+        set_species_param(config, sp, "Habitats", habitat.parameters, overwrite=False)
 
 
 def load_spline_and_scale_factors(lhdf, archetype_hfca):
-
     lhdf = lhdf.set_index('archetype')
     my_spline = [lhdf.at[archetype_hfca, 'MonthVal%d' % x] for x in range(1, 13)]
     maxvalue = lhdf.at[archetype_hfca, 'MaxHab']
@@ -217,6 +214,22 @@ def update_smc_access_ips(campaign, hfca, smc_df):
                                                  target_age_min=5, target_age_max=120)
 
     return {'admin_name': hfca}
+
+
+def set_drug_params(config):
+    # Amodaquine
+    malaria_config.set_drug_param(config, 'Amodiaquine', "Drug_Cmax", 270)
+    malaria_config.set_drug_param(config, 'Amodiaquine', "Drug_Decay_T1", 0.7)
+    malaria_config.set_drug_param(config, 'Amodiaquine', "Drug_Decay_T2", 15.9)
+    malaria_config.set_drug_param(config, 'Amodiaquine', "Drug_PKPD_C50", 55)
+    malaria_config.set_drug_param(config, 'Amodiaquine', "Drug_Vd", 1)
+    malaria_config.set_drug_param(config, 'Amodiaquine', "Max_Drug_IRBC_Kill", 0.2)
+
+    # SulfadoxinePyrimethamine
+    malaria_config.set_drug_param(config, 'SulfadoxinePyrimethamine', "Drug_Decay_T1", 11.5)
+    malaria_config.set_drug_param(config, 'SulfadoxinePyrimethamine', "Drug_Decay_T2", 11.5)
+    malaria_config.set_drug_param(config, 'SulfadoxinePyrimethamine', "Drug_PKPD_C50", 0.9)
+    malaria_config.set_drug_param(config, 'SulfadoxinePyrimethamine', "Max_Drug_IRBC_Kill", 0.28)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 import manifest
 import params
-from snt.helpers_sim_setup import update_basic_params
+from snt.helpers_sim_setup import update_basic_params, set_drug_params
 
 
 def set_config(config):
@@ -20,5 +20,7 @@ def set_config(config):
 
     # move to here from set_input_files
     config.parameters.Demographics_Filenames = [params.demographics_file]
+
+    set_drug_params(config)
 
     return config

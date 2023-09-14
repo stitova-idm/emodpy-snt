@@ -354,8 +354,10 @@ def add_vacc_smc(campaign, start_days, coverages, target_group: dict = None,
 
     """
     if not vaccine_param_dict:
-        vaccine_param_dict = {'vacc_initial_effect': 0.85, 'vacc_box_duration': 13,  # !30,
-                              'vacc_decay_duration': 20}
+        vaccine_param_dict = {'vacc_initial_effect': 0.98, 'vacc_box_duration': 30,
+                             'vacc_decay_duration': 28}
+        # vaccine_param_dict = {'vacc_initial_effect': 0.85, 'vacc_box_duration': 13,  # !30,
+        #                       'vacc_decay_duration': 20}
     vacc_initial_effect = vaccine_param_dict['vacc_initial_effect']
     vacc_box_duration = vaccine_param_dict['vacc_box_duration']
     vacc_decay_duration = vaccine_param_dict['vacc_decay_duration']
@@ -367,7 +369,7 @@ def add_vacc_smc(campaign, start_days, coverages, target_group: dict = None,
     if target_group:
         target_age_min = target_group['agemin']
         target_age_max = target_group['agemax']
-    vacc_smc_offset = 0  # !17  # - x days since no drug clearing event, hence delayed efficacy
+    vacc_smc_offset = 17  # - x days since no drug clearing event, hence delayed efficacy
 
     for (d, cov) in zip(start_days, coverages):
         add_scheduled_vaccine(campaign,

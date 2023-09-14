@@ -47,7 +47,7 @@ help:
 .PHONY: clean
 clean:
 	rm -rf $(BUILDDIR)/*
-	rm -rf emodpy_snt*.rst
+	rm -rf snt*.rst
 	rm -rf modules.rst
 
 .PHONY: generate-api
@@ -56,7 +56,7 @@ clean:
 
 generate-api: 
 	-rm modules.rst
-	sphinx-apidoc -f -e -M -o . ../emodpy_snt
+	sphinx-apidoc -f -e -M -o . ../snt
 
 .PHONY: html
 html:

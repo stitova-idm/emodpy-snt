@@ -68,7 +68,7 @@ podTemplate(
 			stage('Login') {
 				withCredentials([string(credentialsId: 'Comps_emodpy_user', variable: 'user'), string(credentialsId: 'Comps_emodpy_password', variable: 'password'),
 								 string(credentialsId: 'Bamboo_id', variable: 'bamboo_user'), string(credentialsId: 'Bamboo', variable: 'bamboo_password')]) {
-					dir('tests') {
+					dir('examples') {
 						sh 'python3 create_auth_token_args.py --comps_url https://comps2.idmod.org --username $user --password $password'
 						sh 'python3 create_auth_token_args.py --comps_url https://comps.idmod.org --username yechen --password $password'
 					}

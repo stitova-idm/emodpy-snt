@@ -38,6 +38,9 @@ def _post_run(experiment: Experiment, **kwargs):
     Return:
         None
     """
+    with open("monique\\calibration\\seasonality_calibration\\01_burnin_for_seasonalityCalib\\experiment_id.txt", "w") as fd:
+        fd.write(experiment.uid.hex)
+
     pass
 
 
@@ -81,7 +84,7 @@ def run_experiment(**kwargs):
 
     experiment = _config_experiment(**kwargs)
     _pre_run(experiment, **kwargs)
-    experiment.run(**kwargs)
+    experiment.run(wait_until_done=True, wait_on_done=False)
     _post_run(experiment, **kwargs)
 
 

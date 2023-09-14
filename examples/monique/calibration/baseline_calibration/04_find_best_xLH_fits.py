@@ -13,7 +13,7 @@ mpl.rcParams['pdf.fonttype'] = 42
 
 # Specify data location
 USER_PATH = None
-USER_PATH = r'C:\Projects\emodpy-snt\data'
+USER_PATH = r"..\data"
 _, project_path = load_box_paths(user_path=USER_PATH, country_name='Example')
 
 

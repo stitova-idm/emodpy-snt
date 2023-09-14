@@ -5,9 +5,9 @@ import manifest
 burnin_id = 'cab2ccbc-f70a-ee11-aa07-b88303911bc1'  # generated from serialize_transmission_sweep
 expname = 'PfPR_sweep_main_example'
 population_size = 6000  # needs to match burnin simulation population size
-num_seeds = 5
-num_burnin_seeds = 5  # number of seeds run during previous burnin
-ser_date = 30 * 365
+num_seeds = 1
+num_burnin_seeds = 1  # number of seeds run during previous burnin
+ser_date = 10 * 365
 years = 8  # beginning of 2010 - end of 2017
 start_year = 2010
 itn_anc_adult_birthday_years = [20, 22, 24, 26, 28]

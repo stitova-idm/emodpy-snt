@@ -23,3 +23,4 @@ scenario_fname = os.path.join(manifest.project_path, 'simulation_inputs', '_inte
 scen_df = pd.read_csv(scenario_fname)
 # row matching the burnin
 scen_index = scen_df[scen_df['ScenarioName'] == 'transmission_calibration_burnin'].index[0]
+

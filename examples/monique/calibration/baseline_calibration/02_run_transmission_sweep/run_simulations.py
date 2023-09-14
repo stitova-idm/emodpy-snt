@@ -39,6 +39,9 @@ def _post_run(experiment: Experiment, **kwargs):
     Return:
         None
     """
+    # Save experiment id to file to be used by snakefile
+    with open(r"monique\\calibration\\baseline_calibration\\02_run_transmission_sweep\\experiment_id.txt", "w") as fd:
+        fd.write(experiment.uid.hex)
     pass
 
 
@@ -82,7 +85,7 @@ def run_experiment(**kwargs):
 
     experiment = _config_experiment(**kwargs)
     _pre_run(experiment, **kwargs)
-    experiment.run(**kwargs)
+    experiment.run(wait_until_done=True, wait_on_done=False)
     _post_run(experiment, **kwargs)
 
 

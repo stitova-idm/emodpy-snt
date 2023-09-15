@@ -7,7 +7,6 @@ import scipy.stats as stats
 import numpy as np
 
 
-
 def add_vaccdrug_campaign(campaign, campaign_type: str = 'SMC', start_days: list = None,
                           coverages: list = None, target_group: dict = None,
                           vaccine_param_dict: dict = None, drug_param_dict: dict = None,
@@ -27,7 +26,7 @@ def add_vaccdrug_campaign(campaign, campaign_type: str = 'SMC', start_days: list
         otherwise specified via vacc_param_dic, drug_param_dic. The vehicle drug instantly clear parasites (blood stage +
         liver stage) and the prophylactic effect is added by the vaccine event.
 
-        *** Campaign type specifications:
+        Campaign type specifications:
         For SMC, the drug event (MDA drug campaign) is initiated at the specified simdays and generates a broadcast event
         that is used to trigger the vaccine event without delay.
         For PMC, the drug event (MDA drug campaign) is triggered when the individual reaches the eligible age, which is
@@ -50,12 +49,14 @@ def add_vaccdrug_campaign(campaign, campaign_type: str = 'SMC', start_days: list
         coverages: List of effective coverage levels per round of the campaign (fraction of people who receive the
             campaign at each round).
 
-                Example::
-                    [0.8, 0.8, 0.8, 0.8] or  [0.8, 0.7, 0.6, 0.5]
+            Examples::
+
+                [0.8, 0.8, 0.8, 0.8] or  [0.8, 0.7, 0.6, 0.5]
 
         target_group: A dictionary of to specify age range for SMC or age-touchpoints for PMC. Default is Everyone.
 
-                Example::
+            Examples::
+
                  {'agemin': x, 'agemax': y} , if campaign_type = SMC
                  {'1': 76, '2': 106, '3': 274, ...} , if campaign_type = PMC
 
@@ -63,26 +64,32 @@ def add_vaccdrug_campaign(campaign, campaign_type: str = 'SMC', start_days: list
             keys expected: 'vaccine_initial_effect', 'vaccine_box_duration', 'vaccine_decay_duration'
             'vaccine_decay_duration' will be converted to vaccine's Decay_Time_Constant by
             vaccine_decay_duration/log(2)
-            Example and Default: {'vaccine_initial_effect': 0.598, 'vaccine_box_duration': 21.7,
-                          'vaccine_decay_duration': 1.18}
+
+            Examples::
+
+                {'vaccine_initial_effect': 0.598, 'vaccine_box_duration': 21.7, 'vaccine_decay_duration': 1.18}
+
         drug_param_dict: Dictionary of three parameters for initial parasite clearing efficacy (drug campaign).
             Default: Fitted parameters for SMC-SPAQ and PMC-SP.
-            Examples:
+
+            Examples::
+
                 {'drug_irbc_killing': 18.6, 'drug_hep_killing': 1.5, 'drug_box_day': 2.0}
+
         delay_distribution_dict: Dictionary of lists of distribution parameters. Distributions allowed:
             "GAUSSIAN_DISTRIBUTION","LOG_NORMAL_DISTRIBUTION", "CONSTANT_DISTRIBUTION".
             for age-touchpoints, there is also an internal offset (please see code)
             for "CONSTANT_DISTRIBUTION", only 'distribution_name' is used, age-touchpoint is used as the constant
             for "GAUSSIAN_DISTRIBUTION", 'delay_distribution_mean' is ignored, age-touchpoint is used as mean,
-                std is used directly.
+            std is used directly.
             for "LOG_NORMAL_DISTRIBUTION", 'delay_distribution_mean' is converted to mu with
-                np.log(tp_time_trigger + mean) - ((1 / 2) * std ** 2)) and std is used directly as sigma
+            np.log(tp_time_trigger + mean) - ((1 / 2) * std ** 2)) and std is used directly as sigma
 
-                Example::
+            Examples::
 
-                    {'delay_distribution_name': df['distribution_name'],
-                     'delay_distribution_mean': df['distribution_mean'],
-                     'delay_distribution_std': df['distribution_std']}
+                {'delay_distribution_name': df['distribution_name'],
+                 'delay_distribution_mean': df['distribution_mean'],
+                 'delay_distribution_std': df['distribution_std']}
 
         node_ids: The list of nodes to apply this intervention to (**Node_List**
             parameter). If not provided, set value of NodeSetAll.
@@ -104,15 +111,10 @@ def add_vaccdrug_campaign(campaign, campaign_type: str = 'SMC', start_days: list
         receiving_drugs_event_name: Event to send out when person received drugs.
             Event name needs to include 'Received_Vehicle' in it, as otherwise overwritten in drug_campaigns function
             (see drug_campaigns.py L247)
-            Default:
-                SMC: 'Received_Vehicle'
-                PMC: 'Received_Vehicle_X' with X being number of PMC dose
+            Default: SMC: 'Received_Vehicle' ; PMC: 'Received_Vehicle_X' with X being number of PMC dose
         num_iiv_groups: Number of individual drug response groups.
             If >1, ind_property_restrictions is set to {'DrugResponseGroup': val} if campaign_type = PMC, not used for
-            SMC
-            Default:
-                SMC: Not used
-                PMC: 1, IIV only acts on the vaccine event, not the drug event
+            SMC. Default: SMC: Not used. PMC: 1, IIV only acts on the vaccine event, not the drug event
         receiving_drugs_event: Specify whether to deploy the parasite clearing drug event or the vaccine event only.
             Default: True
             Exception: for PMC, set to False
@@ -203,13 +205,13 @@ def add_vaccdrug_smc(campaign, start_days: list, coverages: list,
                      check_eligibility_at_trigger: bool = False):
     """
         Add a vaccine + vehicle drug intervention to approximate efficacy of SMC. This intervention uses default
-    parameters corresponding to SMC with SPAQ, if not otherwise specified via vaccine_param_dict and drug_param_dict.
-    The vehicle drug instantly clear parasites (blood stage + liver stage) and the prophylactic effect is added
-    by the vaccine event.
+        parameters corresponding to SMC with SPAQ, if not otherwise specified via vaccine_param_dict and drug_param_dict.
+        The vehicle drug instantly clear parasites (blood stage + liver stage) and the prophylactic effect is added
+        by the vaccine event.
 
-    *** Campaign type specifications:
-    For SMC, the drug event (MDA drug campaign) is initiated at the specified simdays and generates a broadcast event
-    that is used to trigger the vaccine event without delay.
+        Campaign type specifications:
+        For SMC, the drug event (MDA drug campaign) is initiated at the specified simdays and generates a broadcast event
+        that is used to trigger the vaccine event without delay.
 
     Args:
         campaign: campaign object to which the intervention will be added, and schema_path container
@@ -217,8 +219,11 @@ def add_vaccdrug_smc(campaign, start_days: list, coverages: list,
         coverages: list of coverages for each day in start_days
         target_group: A dictionary of to specify age range for SMC
             Default is Everyone.
-             Example:
+
+             Example::
+
                  {'agemin': x, 'agemax': y} for campaign_type = SMC
+
         node_ids: The list of nodes to apply this intervention to (**Node_List**
             parameter). If not provided, set value of NodeSetAll.
         vaccine_param_dict: dictionary of parameters for vaccine to use with this intervention.
@@ -226,17 +231,16 @@ def add_vaccdrug_smc(campaign, start_days: list, coverages: list,
             'vaccine_decay_duration' will be converted to vaccine's Decay_Time_Constant by
             vaccine_decay_duration/log(2)
             Example and Default: {'vaccine_initial_effect': 0.598, 'vaccine_box_duration': 21.7,
-                          'vaccine_decay_duration': 1.18}
+            'vaccine_decay_duration': 1.18}
         drug_param_dict: dictionary of parameters for a drug to use with this intervention, these will be assigned
-            to the 'Vehicle' drug.
-            Example and Default: {'drug_box_day': 2.0, 'drug_irbc_killing': 10.8, 'drug_hep_killing': 3.64}
+            to the 'Vehicle' drug. Example and Default: {'drug_box_day': 2.0, 'drug_irbc_killing': 10.8,
+            'drug_hep_killing': 3.64}
         receiving_vaccine_event:  Event to send out when person received vaccine.
             Default: 'Received_<campaign_type>_VaccDrug'
         receiving_drugs_event: Event to send out when person received drugs.
             Event name needs to include 'Received_Vehicle' in it, as otherwise overwritten in drug_campaigns function
             (see drug_campaigns.py L247)
-            Default:
-                SMC: 'Received_Vehicle'
+            Default: SMC: 'Received_Vehicle'
         listening_duration: Length of time, in days, for which the triggered event will be listening for the triggers
         trigger_condition_list: List of events that will begin a triggerable
             campaign if campaign_type is SMC. If campaign_type is PMC, campaign is triggered by birth per default.
@@ -244,7 +248,6 @@ def add_vaccdrug_smc(campaign, start_days: list, coverages: list,
             individuals must have to receive the diagnostic intervention.
             For example, ``[{"IndividualProperty1":"PropertyValue1"},
             {"IndividualProperty2":"PropertyValue2"}]``. Default is no restrictions.
-
         target_residents_only: When set to True the intervention is only distributed to individuals that began the
             simulation in that node.
         check_eligibility_at_trigger: If triggered event is delayed, you have an
@@ -254,20 +257,16 @@ def add_vaccdrug_smc(campaign, start_days: list, coverages: list,
         receiving_drugs_event_name: Event to send out when person received drugs.
             Event name needs to include 'Received_Vehicle' in it, as otherwise overwritten in drug_campaigns function
             (see drug_campaigns.py L247)
-            Default:
-                SMC: 'Received_Vehicle'
-                PMC: 'Received_Vehicle_X' with X being number of PMC dose
+            Default: SMC: 'Received_Vehicle'; PMC: 'Received_Vehicle_X' with X being number of PMC dose
         num_iiv_groups: Number of individual drug response groups.
             If >1, ind_property_restrictions is set to {'DrugResponseGroup': val} if campaign_type = PMC, not used for
-            SMC
-            Default:
-                SMC: Not used
-                PMC: 1, IIV only acts on the vaccine event, not the drug event
+            SMC. Default: SMC: Not used; PMC: 1, IIV only acts on the vaccine event, not the drug event
         receiving_drugs_event: Specify whether to deploy the parasite clearing drug event or the vaccine event only.
             Default: True
             Exception: for PMC, set to False
-    Returns:
 
+    Returns:
+        dictionary of tags
     """
     if len(start_days) != len(coverages):
         raise ValueError(f"Length of start_days - {len(start_days)}, should be equal to length of coverages - "
@@ -355,7 +354,7 @@ def add_vacc_smc(campaign, start_days, coverages, target_group: dict = None,
     """
     if not vaccine_param_dict:
         vaccine_param_dict = {'vacc_initial_effect': 0.98, 'vacc_box_duration': 30,
-                             'vacc_decay_duration': 28}
+                              'vacc_decay_duration': 28}
         # vaccine_param_dict = {'vacc_initial_effect': 0.85, 'vacc_box_duration': 13,  # !30,
         #                       'vacc_decay_duration': 20}
     vacc_initial_effect = vaccine_param_dict['vacc_initial_effect']
@@ -441,7 +440,8 @@ def add_vaccdrug_pmc(campaign, start_days: list, coverages: list,
 
     pmc_touchpoints = list(target_group.values())
     pmc_event_names = [f'PMC_{x + 1}' for x in range(len(pmc_touchpoints))]
-    if len(pmc_touchpoints) != len(coverages) or len(pmc_touchpoints) != len(delay_distribution_dict['delay_distribution_name']):
+    if len(pmc_touchpoints) != len(coverages) or len(pmc_touchpoints) != len(
+            delay_distribution_dict['delay_distribution_name']):
         raise ValueError(f"Length of target_groups's values - {len(pmc_touchpoints)}, should be equal to "
                          f"length of coverages - "
                          f"{len(coverages)} and length of the list of delay distributions "

@@ -56,8 +56,8 @@ class ItvFn:
     """
     Sweeping utility: works for sweeping on interventions.
     Requirements:
-     - func is a method that takes campaign as first parameter
-     - func return a dict
+    1. func is a method that takes campaign as first parameter
+    2. func return a dict
 
     Returns:
         dict
@@ -103,8 +103,8 @@ class CfgFn:
     """
     Sweeping utility: works for sweeping on config parameters.
     Requirements:
-     - func is a method that takes config as first parameter
-     - func return a dict
+    1. func is a method that takes config as first parameter
+    2. func return a dict
 
     Returns:
         dict
@@ -131,8 +131,8 @@ class SwpFn:
     """
     Sweeping utility: works for sweeping on report, demographics, migrations and climate, etc.
     Requirements:
-     - func is a method that takes task as first parameter
-     - func return a dict
+    1. func is a method that takes task as first parameter
+    2. func return a dict
 
     Returns:
         dict

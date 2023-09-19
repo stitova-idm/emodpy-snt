@@ -171,7 +171,7 @@ def _post_run(suite_id, **kwargs):
     suite = platform.get_item(suite_id, ItemType.SUITE)
 
     if all([exp.succeeded for exp in suite.experiments]):
-        with open(r"monique\\calibration\\seasonality_calibration\\02_seasonality_calibration\\experiment_id.txt", "w") as fd:
+        with open("monique/calibration/seasonality_calibration/02_seasonality_calibration/experiment_id.txt", "w") as fd:
             fd.write("Calibration good.")
 
 
@@ -194,6 +194,7 @@ def run_calibration(directory: str = '.', **kwargs):
     _pre_run(**kwargs)
     calib_manager.run_calibration(**kwargs)
     _post_run(calib_manager.suite_id, **kwargs)
+
 
 if __name__ == "__main__":
     """

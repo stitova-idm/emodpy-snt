@@ -224,7 +224,7 @@ rule run_2005_2022:
         shell(get_command(script=run_2005_to_2022 + r"run_simulations.py",
             python_version=config['python_version']))
 
-onsuccess:
-    delete_outputs(expected_outputs)
-onerror:
-    delete_outputs(expected_outputs)
+# onsuccess:
+#     delete_outputs(expected_outputs)
+# onerror:
+#     delete_outputs(expected_outputs)

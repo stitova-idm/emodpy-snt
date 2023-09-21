@@ -55,7 +55,7 @@ onstart:
     if not os.path.exists(download_folder + r"/schema.json"):
         dtk.setup(download_folder)
         os.chdir(os.path.dirname(__file__))
-    # delete_outputs(expected_outputs)
+    delete_outputs(expected_outputs)
 
 rule all:
     input: expected_outputs
@@ -80,7 +80,7 @@ rule run_transmission_sweep:
     input: baseline_calibration + r"01_serialize_transmission_sweep/experiment_id.txt",
            baseline_calibration + r"02_run_transmission_sweep/params.py",
            baseline_calibration + r"02_run_transmission_sweep/manifest.py",
-           baseline_calibration + r"02_run_transmission_sweep/config_sweep_builder.py",
+           baseline_calibration + r"02_run_transmission_sweep/config_sweep_builders.py",
     output: touch(baseline_calibration + r"02_run_transmission_sweep/experiment_id.txt")
     run:
         with open(input[0]) as exp_id_file:

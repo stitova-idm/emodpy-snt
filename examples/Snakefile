@@ -197,7 +197,7 @@ run_1960_to_2004 = r"ben/example/run_1960-2004/"
 
 rule run_1960_2004:
     input: run_1960_to_2004 + r"params.py",run_1960_to_2004 + r"manifest.py"
-    output: run_1960_to_2004 + r"experiment_id.txt"
+    output: touch(run_1960_to_2004 + r"experiment_id.txt")
     run:
         update_parameters_in_file(input[0],{"num_seeds = ": "num_seeds = 1 \n",
                                             "iopath = ": "iopath = 'ben/IO' \n",
@@ -213,13 +213,14 @@ rule run_2005_2022:
     input: run_1960_to_2004 + r"experiment_id.txt",
            run_2005_to_2022 + r"params.py",
            run_2005_to_2022 + r"manifest.py"
-    output: run_2005_to_2022 + r"experiment_id.txt"
+    output: touch(run_2005_to_2022 + r"experiment_id.txt")
     run:
         with open(input[0]) as exp_id_file:
             burnin_id = exp_id_file.read()
         update_parameters_in_file(input[1],{"burnin_id = ": f"burnin_id = '{burnin_id}'\n",
                                             "iopath = ": "iopath = 'ben/IO' \n",
                                             "ser_date =": "ser_date = 5 * 365\n"})
+        update_parameters_in_file(input[2],{"BEN_DIR = ": f"BEN_DIR = r'ben'\n",
         update_parameters_in_file(input[2],{"BEN_DIR = ": f"BEN_DIR = r'ben'\n",
                                             "sif_path = ": "sif_path = 'dtk_sif.id'\n"})
         shell(get_command(script=run_2005_to_2022 + r"run_simulations.py",

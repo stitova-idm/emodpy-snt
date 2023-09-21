@@ -43,7 +43,7 @@ def _post_run(experiment: Experiment, **kwargs):
         None
     """
     wait_until_done = kwargs.get('wait_until_done', None)
-    if wait_until_done and experiment.succeeded:
+    if experiment.succeeded:
         with open("ben/example/run_2005-2022/experiment_id.txt", "w") as fd:
             fd.write(experiment.uid.hex)
 
@@ -88,7 +88,7 @@ def run_experiment(**kwargs):
 
     experiment = _config_experiment(**kwargs)
     _pre_run(experiment, **kwargs)
-    experiment.run(**kwargs)
+    experiment.run(wait_until_done=True, **kwargs)
     _post_run(experiment, **kwargs)
 
 
@@ -111,4 +111,4 @@ if __name__ == "__main__":
     # dtk.setup(pathlib.Path(manifest.eradication_path).parent)
     # os.chdir(os.path.dirname(__file__))
     # print("...done.")
-    run_experiment(show_warnings_once=True, wait_until_done=True)
+    run_experiment(show_warnings_once=True )

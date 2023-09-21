@@ -30,7 +30,7 @@ def get_command(script="run_simulations.py", python_version: str = None):
 # doing it manually because... too complicated otherwise? re
 expected_outputs = [r"monique/calibration/baseline_calibration/01_serialize_transmission_sweep/experiment_id.txt",
                     r"monique/calibration/baseline_calibration/02_run_transmission_sweep/experiment_id.txt",
-                    # r"monthly_U5_PfPR.csv",
+                    r"monthly_U5_PfPR.csv",
                     r"../data/example_files/simulation_output/calibration/baseline_calibration/LL_allxLH_each_admin_run/CC_run3.csv",
                     r"../data/example_files/simulation_inputs/larval_habitats/monthly_habitats_1.csv",
                     r"monique/calibration/seasonality_calibration/01_burnin_for_seasonalityCalib/experiment_id.txt",
@@ -40,12 +40,21 @@ expected_outputs = [r"monique/calibration/baseline_calibration/01_serialize_tran
                     r"ben/example/run_1960-2004/experiment_id.txt",
                     r"ben/example/run_2005-2022/experiment_id.txt"]
 
+
+def delete_outputs(outputs):
+    for output_file in outputs:
+        if os.path.exists(output_file):
+            os.remove(output_file)
+    calibra_folder = r"monique/calibration/seasonality_calibration/Calibra"
+    if os.path.exists(calibra_folder):
+        shutil.rmtree(calibra_folder)
+
 download_folder = r"../download"
 onstart:
     if not os.path.exists(download_folder + r"/schema.json"):
-        print("should be making download folder\n")
         dtk.setup(download_folder)
         os.chdir(os.path.dirname(__file__))
+    delete_outputs(expected_outputs)
 
 rule all:
     input: expected_outputs
@@ -82,17 +91,17 @@ rule run_transmission_sweep:
         shell(get_command(script=baseline_calibration + r"02_run_transmission_sweep/run_simulations.py",
             python_version=config['python_version']))
 
-# rule analyze_ssmt_monthy_U5_PfPR:
-#     input: baseline_calibration + r"02_run_transmission_sweep/experiment_id.txt",
-#            baseline_calibration + r"03_analyze_ssmt_monthly_U5_PfPR.py"
-#     output: r"monthly_U5_PfPR.csv"
-#     run:
-#         with open(input[0]) as exp_id_file:
-#             burnin_id = exp_id_file.read()
-#             update_parameters_in_file(input[1],
-#                 {"experiments = ": f"experiments = {{'PfPR_sweep_main_example': '{burnin_id}'}}\n"})
-#         shell(get_command(script=baseline_calibration + r"03_analyze_ssmt_monthly_U5_PfPR.py",
-#             python_version=config['python_version']))
+rule analyze_ssmt_monthy_U5_PfPR:
+    input: baseline_calibration + r"02_run_transmission_sweep/experiment_id.txt",
+           baseline_calibration + r"03_analyze_ssmt_monthly_U5_PfPR.py"
+    output: r"monthly_U5_PfPR.csv"
+    run:
+        with open(input[0]) as exp_id_file:
+            burnin_id = exp_id_file.read()
+            update_parameters_in_file(input[1],
+                {"experiments = ": f"experiments = {{'PfPR_sweep_main_example': '{burnin_id}'}}\n"})
+        shell(get_command(script=baseline_calibration + r"03_analyze_ssmt_monthly_U5_PfPR.py",
+            python_version=config['python_version']))
 
 rule find_best_xLH_fits:
     output:
@@ -131,9 +140,6 @@ rule seasonality_calibration:
                                             "burnin_years = ": "    burnin_years = 5\n"})
         update_parameters_in_file(input[2],{"USER_PATH = ": f"USER_PATH = r'../data'\n",
                                             "sif_id = None": "sif_id = 'dtk_sif.id'\n"})
-        calibra = seasonality_cal + r"02_seasonality_calibration/Calibra_results"
-        if os.path.exists(calibra):
-            shutil.rmtree(calibra)
         shell(get_command(script=r"monique/calibration/seasonality_calibration/02_seasonality_calibration/run_calibration.py",
             python_version=config['python_version']))
 
@@ -218,8 +224,7 @@ rule run_2005_2022:
         shell(get_command(script=run_2005_to_2022 + r"run_simulations.py",
             python_version=config['python_version']))
 
-
-rule clean_output:
-    run:
-        for file in expected_outputs:
-            os.remove(file)
+onsuccess:
+    delete_outputs(expected_outputs)
+onerror:
+    delete_outputs(expected_outputs)

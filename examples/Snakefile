@@ -226,5 +226,5 @@ rule run_2005_2022:
 
 onsuccess:
     delete_outputs(expected_outputs)
-orerror:
+onerror:
     delete_outputs(expected_outputs)

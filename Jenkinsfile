@@ -1,5 +1,5 @@
 podTemplate(
-    //idleMinutes : 30,
+    idleMinutes : 30,
     podRetention : onFailure(),
     activeDeadlineSeconds : 3600,
     containers: [

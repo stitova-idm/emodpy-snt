@@ -43,6 +43,8 @@ def _post_run(experiment: Experiment, **kwargs):
         None
     """
     # wait_until_done = kwargs.get('wait_until_done', None)
+    print("\nWE MADE IT\n")
+    print(f"\nexperiment. {experiment.succeeded}\n")
     if experiment.succeeded:
         print("\nWRITING\n")
         with open("ben/example/run_1960-2004/experiment_id.txt", "w") as fd:

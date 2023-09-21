@@ -221,7 +221,6 @@ rule run_2005_2022:
                                             "iopath = ": "iopath = 'ben/IO' \n",
                                             "ser_date =": "ser_date = 5 * 365\n"})
         update_parameters_in_file(input[2],{"BEN_DIR = ": f"BEN_DIR = r'ben'\n",
-        update_parameters_in_file(input[2],{"BEN_DIR = ": f"BEN_DIR = r'ben'\n",
                                             "sif_path = ": "sif_path = 'dtk_sif.id'\n"})
         shell(get_command(script=run_2005_to_2022 + r"run_simulations.py",
             python_version=config['python_version']))

@@ -55,7 +55,7 @@ onstart:
     if not os.path.exists(download_folder + r"/schema.json"):
         dtk.setup(download_folder)
         os.chdir(os.path.dirname(__file__))
-    delete_outputs(expected_outputs)
+    # delete_outputs(expected_outputs)
 
 rule all:
     input: expected_outputs

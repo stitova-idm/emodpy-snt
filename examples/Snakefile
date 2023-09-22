@@ -91,7 +91,7 @@ rule run_transmission_sweep:
                                             "population_size =": "population_size = 2000\n"})
         update_parameters_in_file(input[2],{"USER_PATH = ": f"USER_PATH = r'../data'\n",
                                             "sif_id = None": "sif_id = 'dtk_sif.id'\n"})
-        update_parameters_in_file(input[3],{"rep_admin:": f"        rep_admin: [np.logspace(-1.6, 25)[ii] for ii in [0, 8, 20]] for rep_admin in'\n"})
+        update_parameters_in_file(input[3],{"rep_admin:": f"        rep_admin: [np.logspace(-1.6, 25)[ii] for ii in [0, 8, 20]] for rep_admin in\n"})
         shell(get_command(script=baseline_calibration + r"02_run_transmission_sweep/run_simulations.py",
             python_version=config['python_version']))
 

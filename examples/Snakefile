@@ -46,9 +46,6 @@ def delete_outputs(outputs):
     for output_file in outputs:
         if os.path.exists(output_file):
             os.remove(output_file)
-    calibra_folder = r"monique/calibration/seasonality_calibration/Calibra"
-    if os.path.exists(calibra_folder):
-        shutil.rmtree(calibra_folder)
 
 download_folder = r"../download"
 onstart:
@@ -148,6 +145,9 @@ rule seasonality_calibration:
                                             "simulation_pop =": "simulation_pop = 2000\n"})
         update_parameters_in_file(input[2],{"USER_PATH = ": f"USER_PATH = r'../data'\n",
                                             "sif_id = None": "sif_id = 'dtk_sif.id'\n"})
+        calibra_folder = r"monique/calibration/seasonality_calibration/Calibra"
+        if os.path.exists(calibra_folder):
+            shutil.rmtree(calibra_folder)
         shell(get_command(script=r"monique/calibration/seasonality_calibration/02_seasonality_calibration/run_calibration.py",
             python_version=config['python_version']))
 

@@ -88,7 +88,7 @@ def run_experiment(**kwargs):
 
     experiment = _config_experiment(**kwargs)
     _pre_run(experiment, **kwargs)
-    experiment.run(wait_until_done=True, **kwargs)
+    experiment.run(**kwargs)
     _post_run(experiment, **kwargs)
 
 
@@ -111,4 +111,4 @@ if __name__ == "__main__":
     # dtk.setup(pathlib.Path(manifest.eradication_path).parent)
     # os.chdir(os.path.dirname(__file__))
     # print("...done.")
-    run_experiment(show_warnings_once=True)
+    run_experiment(show_warnings_once=True, wait_until_done=True)

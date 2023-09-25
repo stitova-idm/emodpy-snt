@@ -43,8 +43,9 @@ expected_outputs = [
 
 
 def delete_outputs(outputs):
-    delete_these = outputs.remove(r"../data/example_files/simulation_output/calibration/baseline_calibration/LL_allxLH_each_admin_run/CC_run3.csv")
-    for output_file in delete_these:
+    outputs.remove(r"../data/example_files/simulation_output/calibration/baseline_calibration/LL_allxLH_each_admin_run/CC_run3.csv")
+    print(f"{outputs}")
+    for output_file in outputs:
         if os.path.exists(output_file):
             os.remove(output_file)
 
